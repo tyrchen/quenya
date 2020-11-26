@@ -42,7 +42,22 @@
             "Error": {
                 "content": {
                     "application/json": {
-                        "schema": "#/components/schemas/Error"
+                        "schema": {
+                            "properties": {
+                                "code": {
+                                    "format": "int32",
+                                    "type": "integer"
+                                },
+                                "message": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "type": "object"
+                        }
                     }
                 },
                 "description": "unexpected error"
@@ -50,7 +65,45 @@
             "Todo": {
                 "content": {
                     "application/json": {
-                        "schema": "#/components/schemas/Todo"
+                        "schema": {
+                            "example": {
+                                "body": "hello world!",
+                                "created": "2020-11-11T17:32:28Z",
+                                "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                "status": "active",
+                                "updated": "2020-11-11T19:32:28Z"
+                            },
+                            "properties": {
+                                "body": {
+                                    "maxLength": 140,
+                                    "minLength": 3,
+                                    "type": "string"
+                                },
+                                "created": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "enum": [
+                                        "active",
+                                        "completed"
+                                    ],
+                                    "type": "string"
+                                },
+                                "updated": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "body"
+                            ],
+                            "type": "object"
+                        }
                     }
                 },
                 "description": "a single todo item"
@@ -58,12 +111,61 @@
             "Todos": {
                 "content": {
                     "application/json": {
-                        "schema": "#/components/schemas/Todos"
+                        "schema": {
+                            "items": {
+                                "example": {
+                                    "body": "hello world!",
+                                    "created": "2020-11-11T17:32:28Z",
+                                    "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                    "status": "active",
+                                    "updated": "2020-11-11T19:32:28Z"
+                                },
+                                "properties": {
+                                    "body": {
+                                        "maxLength": 140,
+                                        "minLength": 3,
+                                        "type": "string"
+                                    },
+                                    "created": {
+                                        "format": "date-time",
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "enum": [
+                                            "active",
+                                            "completed"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "updated": {
+                                        "format": "date-time",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "body"
+                                ],
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
                     }
                 },
                 "description": "a paged array of todo items",
                 "headers": {
-                    "X-Cursor": "#/components/parameters/cursor"
+                    "X-Cursor": {
+                        "description": "cursor for next page",
+                        "in": "header",
+                        "name": "X-Cursor",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -93,11 +195,30 @@
                     "updated": "2020-11-11T19:32:28Z"
                 },
                 "properties": {
-                    "body": "#/components/schemas/todoBody",
-                    "created": "#/components/schemas/dateTime",
-                    "id": "#/components/schemas/todoId",
-                    "status": "#/components/schemas/status",
-                    "updated": "#/components/schemas/dateTime"
+                    "body": {
+                        "maxLength": 140,
+                        "minLength": 3,
+                        "type": "string"
+                    },
+                    "created": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "status": {
+                        "enum": [
+                            "active",
+                            "completed"
+                        ],
+                        "type": "string"
+                    },
+                    "updated": {
+                        "format": "date-time",
+                        "type": "string"
+                    }
                 },
                 "required": [
                     "body"
@@ -105,7 +226,45 @@
                 "type": "object"
             },
             "Todos": {
-                "items": "#/components/schemas/Todo",
+                "items": {
+                    "example": {
+                        "body": "hello world!",
+                        "created": "2020-11-11T17:32:28Z",
+                        "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                        "status": "active",
+                        "updated": "2020-11-11T19:32:28Z"
+                    },
+                    "properties": {
+                        "body": {
+                            "maxLength": 140,
+                            "minLength": 3,
+                            "type": "string"
+                        },
+                        "created": {
+                            "format": "date-time",
+                            "type": "string"
+                        },
+                        "id": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "status": {
+                            "enum": [
+                                "active",
+                                "completed"
+                            ],
+                            "type": "string"
+                        },
+                        "updated": {
+                            "format": "date-time",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "body"
+                    ],
+                    "type": "object"
+                },
                 "type": "array"
             },
             "dateTime": {
@@ -152,7 +311,29 @@
                     "204": {
                         "description": "No content"
                     },
-                    "default": "#/components/responses/Error"
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "format": "int32",
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "unexpected error"
+                    }
                 },
                 "tags": [
                     "todo"
@@ -173,8 +354,75 @@
                     }
                 ],
                 "responses": {
-                    "200": "#/components/responses/Todo",
-                    "default": "#/components/responses/Error"
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "example": {
+                                        "body": "hello world!",
+                                        "created": "2020-11-11T17:32:28Z",
+                                        "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                        "status": "active",
+                                        "updated": "2020-11-11T19:32:28Z"
+                                    },
+                                    "properties": {
+                                        "body": {
+                                            "maxLength": 140,
+                                            "minLength": 3,
+                                            "type": "string"
+                                        },
+                                        "created": {
+                                            "format": "date-time",
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "format": "uuid",
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "enum": [
+                                                "active",
+                                                "completed"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        "updated": {
+                                            "format": "date-time",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "body"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "a single todo item"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "format": "int32",
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "unexpected error"
+                    }
                 },
                 "tags": [
                     "todo"
@@ -193,7 +441,13 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "status": "#/components/schemas/status"
+                                    "status": {
+                                        "enum": [
+                                            "active",
+                                            "completed"
+                                        ],
+                                        "type": "string"
+                                    }
                                 },
                                 "type": "object"
                             }
@@ -203,8 +457,75 @@
                     "required": true
                 },
                 "responses": {
-                    "200": "#/components/responses/Todo",
-                    "default": "#/components/responses/Error"
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "example": {
+                                        "body": "hello world!",
+                                        "created": "2020-11-11T17:32:28Z",
+                                        "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                        "status": "active",
+                                        "updated": "2020-11-11T19:32:28Z"
+                                    },
+                                    "properties": {
+                                        "body": {
+                                            "maxLength": 140,
+                                            "minLength": 3,
+                                            "type": "string"
+                                        },
+                                        "created": {
+                                            "format": "date-time",
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "format": "uuid",
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "enum": [
+                                                "active",
+                                                "completed"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        "updated": {
+                                            "format": "date-time",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "body"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "a single todo item"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "format": "int32",
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "unexpected error"
+                    }
                 },
                 "tags": [
                     "todo"
@@ -224,8 +545,89 @@
                     }
                 ],
                 "responses": {
-                    "200": "#/components/responses/Todos",
-                    "default": "#/components/responses/Error"
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "example": {
+                                            "body": "hello world!",
+                                            "created": "2020-11-11T17:32:28Z",
+                                            "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                            "status": "active",
+                                            "updated": "2020-11-11T19:32:28Z"
+                                        },
+                                        "properties": {
+                                            "body": {
+                                                "maxLength": 140,
+                                                "minLength": 3,
+                                                "type": "string"
+                                            },
+                                            "created": {
+                                                "format": "date-time",
+                                                "type": "string"
+                                            },
+                                            "id": {
+                                                "format": "uuid",
+                                                "type": "string"
+                                            },
+                                            "status": {
+                                                "enum": [
+                                                    "active",
+                                                    "completed"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "updated": {
+                                                "format": "date-time",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "body"
+                                        ],
+                                        "type": "object"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "a paged array of todo items",
+                        "headers": {
+                            "X-Cursor": {
+                                "description": "cursor for next page",
+                                "in": "header",
+                                "name": "X-Cursor",
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "format": "int32",
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "unexpected error"
+                    }
                 },
                 "tags": [
                     "todos"
@@ -240,15 +642,120 @@
                             "example": {
                                 "body": "hello world"
                             },
-                            "schema": "#/components/schemas/Todo"
+                            "schema": {
+                                "example": {
+                                    "body": "hello world!",
+                                    "created": "2020-11-11T17:32:28Z",
+                                    "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                    "status": "active",
+                                    "updated": "2020-11-11T19:32:28Z"
+                                },
+                                "properties": {
+                                    "body": {
+                                        "maxLength": 140,
+                                        "minLength": 3,
+                                        "type": "string"
+                                    },
+                                    "created": {
+                                        "format": "date-time",
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "enum": [
+                                            "active",
+                                            "completed"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "updated": {
+                                        "format": "date-time",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "body"
+                                ],
+                                "type": "object"
+                            }
                         }
                     },
                     "description": "todo item to be posted",
                     "required": true
                 },
                 "responses": {
-                    "201": "#/components/responses/Todo",
-                    "default": "#/components/responses/Error"
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "example": {
+                                        "body": "hello world!",
+                                        "created": "2020-11-11T17:32:28Z",
+                                        "id": "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                                        "status": "active",
+                                        "updated": "2020-11-11T19:32:28Z"
+                                    },
+                                    "properties": {
+                                        "body": {
+                                            "maxLength": 140,
+                                            "minLength": 3,
+                                            "type": "string"
+                                        },
+                                        "created": {
+                                            "format": "date-time",
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "format": "uuid",
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "enum": [
+                                                "active",
+                                                "completed"
+                                            ],
+                                            "type": "string"
+                                        },
+                                        "updated": {
+                                            "format": "date-time",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "body"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "a single todo item"
+                    },
+                    "default": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "format": "int32",
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "unexpected error"
+                    }
                 },
                 "tags": [
                     "todos"

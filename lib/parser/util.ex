@@ -10,9 +10,17 @@ defmodule Quenya.Parser.Util do
     Enum.reduce(val, %{}, fn {k, v}, acc ->
       result =
         case v do
-          %{"$ref" => path} -> process_ref_fn.(components, path, recursive)
-          v when is_map(v) -> update_map(components, v, recursive, process_ref_fn)
-          v -> v
+          %{"$ref" => path} ->
+            process_ref_fn.(components, path, recursive)
+
+          v when is_list(v) ->
+            Enum.map(v, fn item -> update_map(components, item, recursive, process_ref_fn) end)
+
+          v when is_map(v) ->
+            update_map(components, v, recursive, process_ref_fn)
+
+          v ->
+            v
         end
 
       Map.put(acc, k, result)
