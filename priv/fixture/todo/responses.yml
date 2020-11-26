@@ -1,0 +1,21 @@
+Todo:
+  description: a single todo item
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/schemas/Todo"
+Error:
+  description: unexpected error
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/schemas/Error"
+Todos:
+  description: a paged array of todo items
+  headers:
+    X-Cursor:
+      $ref: "#/components/parameters/cursor"
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/schemas/Todos"

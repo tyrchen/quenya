@@ -7,20 +7,17 @@ defmodule Quenya.Parser.LocalRef do
   @doc """
   Iterate the map and replace all $ref to the actual data
   """
-  @spec update(map) :: map
+  @spec update(map()) :: {:ok, map()} | {:error, String.t()}
   def update(data) do
-    components =
-      data
-      |> Map.get("components")
-      |> do_extend_components("schemas")
-      |> do_extend_components("parameters")
-      |> do_extend_components("responses")
-
-    paths = do_extend_paths(components, Map.get(data, "paths"))
-
-    data
-    |> Map.put("components", components)
-    |> Map.put("paths", paths)
+    with {:ok, comp} <- Map.fetch(data, "components"),
+         {:ok, comp1} <- do_extend_components(comp, "schemas"),
+         {:ok, comp2} <- do_extend_components(comp1, "parameters"),
+         {:ok, comp3} <- do_extend_components(comp2, "responses"),
+         {:ok, paths} <- do_extend_paths(comp3, Map.get(data, "paths")) do
+      {:ok, %{data | "components" => comp3, "paths" => paths}}
+    else
+      e -> e
+    end
   end
 
   defp do_extend_components(data, type) do
@@ -31,33 +28,48 @@ defmodule Quenya.Parser.LocalRef do
       end
 
     updated =
-      Enum.reduce(data[type], %{}, fn {k, v}, acc ->
+      Enum.reduce_while(data[type], %{}, fn {k, v}, acc ->
         result =
           Util.update_map(
             data,
             v,
             recursive,
-            fn comp, path, recursive -> do_extend_ref(comp, path, recursive) end
+            fn context, path, recursive -> do_extend_ref(context, path, recursive) end
           )
 
-        Map.put(acc, k, result)
+        case result do
+          {:error, msg} -> {:halt, {:error, msg}}
+          _v -> {:cont, Map.put(acc, k, result)}
+        end
       end)
 
-    Map.put(data, type, updated)
+    case updated do
+      {:error, msg} -> {:error, msg}
+      _ -> {:ok, Map.put(data, type, updated)}
+    end
   end
 
   defp do_extend_paths(components, paths) do
-    Enum.reduce(paths, %{}, fn {k, v}, acc ->
-      result =
-        Util.update_map(
-          components,
-          v,
-          false,
-          fn comp, path, recursive -> do_extend_ref(comp, path, recursive) end
-        )
+    updated =
+      Enum.reduce_while(paths, %{}, fn {k, v}, acc ->
+        result =
+          Util.update_map(
+            components,
+            v,
+            false,
+            fn context, path, recursive -> do_extend_ref(context, path, recursive) end
+          )
 
-      Map.put(acc, k, result)
-    end)
+        case result do
+          {:error, msg} -> {:halt, {:error, msg}}
+          _v -> {:cont, Map.put(acc, k, result)}
+        end
+      end)
+
+    case updated do
+      {:error, msg} -> {:error, msg}
+      _ -> {:ok, updated}
+    end
   end
 
   defp do_extend_ref(data, path, recursive) do
@@ -70,11 +82,13 @@ defmodule Quenya.Parser.LocalRef do
           data,
           v,
           recursive,
-          fn comp, path, recursive -> do_extend_ref(comp, path, recursive) end
+          fn context, path, recursive -> do_extend_ref(context, path, recursive) end
         )
 
       _ ->
         v
     end
+  rescue
+    _ -> {:error, "failed to extend ref for #{path}"}
   end
 end
