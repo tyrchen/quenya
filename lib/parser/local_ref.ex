@@ -2,6 +2,7 @@ defmodule Quenya.Parser.LocalRef do
   @moduledoc """
   Process local reference
   """
+  alias Quenya.Parser.Util
 
   @doc """
   Iterate the map and replace all $ref to the actual data
@@ -31,7 +32,14 @@ defmodule Quenya.Parser.LocalRef do
 
     updated =
       Enum.reduce(data[type], %{}, fn {k, v}, acc ->
-        result = do_reduce_value(data, v, recursive)
+        result =
+          Util.update_map(
+            data,
+            v,
+            recursive,
+            fn comp, path, recursive -> do_extend_ref(comp, path, recursive) end
+          )
+
         Map.put(acc, k, result)
       end)
 
@@ -40,7 +48,14 @@ defmodule Quenya.Parser.LocalRef do
 
   defp do_extend_paths(components, paths) do
     Enum.reduce(paths, %{}, fn {k, v}, acc ->
-      result = do_reduce_value(components, v, false)
+      result =
+        Util.update_map(
+          components,
+          v,
+          false,
+          fn comp, path, recursive -> do_extend_ref(comp, path, recursive) end
+        )
+
       Map.put(acc, k, result)
     end)
   end
@@ -50,21 +65,16 @@ defmodule Quenya.Parser.LocalRef do
     v = data[l2][l3]
 
     case recursive do
-      true -> do_reduce_value(data, v, recursive)
-      _ -> v
+      true ->
+        Util.update_map(
+          data,
+          v,
+          recursive,
+          fn comp, path, recursive -> do_extend_ref(comp, path, recursive) end
+        )
+
+      _ ->
+        v
     end
-  end
-
-  defp do_reduce_value(data, val, recursive) do
-    Enum.reduce(val, %{}, fn {k, v}, acc ->
-      result =
-        case v do
-          %{"$ref" => path} -> do_extend_ref(data, path, recursive)
-          v when is_map(v) -> do_reduce_value(data, v, recursive)
-          v -> v
-        end
-
-      Map.put(acc, k, result)
-    end)
   end
 end

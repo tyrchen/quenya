@@ -349,7 +349,8 @@
                         "name": "todoId",
                         "required": true,
                         "schema": {
-                            "$ref": "#/components/schemas/todoId"
+                            "format": "uuid",
+                            "type": "string"
                         }
                     }
                 ],
@@ -538,10 +539,31 @@
                 "operationId": "listTodos",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/limit"
+                        "description": "how many items to return at one time * default: 10 * min: 10 * max: 100\n",
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "schema": {
+                            "default": 10,
+                            "format": "int32",
+                            "maximum": 100,
+                            "minimum": 10,
+                            "type": "integer"
+                        }
                     },
                     {
-                        "$ref": "#/components/parameters/filter"
+                        "description": "filter type:\n  * `all`: default, show all items\n  * `active`: show active todo items\n  * `completed`: show completed todo items\n",
+                        "in": "query",
+                        "name": "filter",
+                        "schema": {
+                            "default": "all",
+                            "enum": [
+                                "all",
+                                "active",
+                                "completed"
+                            ],
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {

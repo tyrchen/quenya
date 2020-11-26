@@ -6,12 +6,16 @@ defmodule Quenya.Parser.Util do
   @doc """
   Update the map recursively for $ref
   """
+  def update_map(components, %{"$ref" => path}, recursive, process_ref_fn) do
+    process_ref_fn.(components, path, recursive)
+  end
+
   def update_map(components, val, recursive, process_ref_fn) when is_map(val) do
     Enum.reduce(val, %{}, fn {k, v}, acc ->
       result =
         case v do
-          %{"$ref" => path} ->
-            process_ref_fn.(components, path, recursive)
+          %{"$ref" => _path} ->
+            update_map(components, v, recursive, process_ref_fn)
 
           v when is_list(v) ->
             Enum.map(v, fn item -> update_map(components, item, recursive, process_ref_fn) end)
