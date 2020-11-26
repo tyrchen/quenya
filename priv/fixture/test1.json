@@ -42,7 +42,9 @@
             "Error": {
                 "content": {
                     "application/json": {
-                        "schema": "#/components/schemas/Error"
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
                     }
                 },
                 "description": "unexpected error"
@@ -50,7 +52,9 @@
             "Todo": {
                 "content": {
                     "application/json": {
-                        "schema": "#/components/schemas/Todo"
+                        "schema": {
+                            "$ref": "#/components/schemas/Todo"
+                        }
                     }
                 },
                 "description": "a single todo item"
@@ -58,12 +62,16 @@
             "Todos": {
                 "content": {
                     "application/json": {
-                        "schema": "#/components/schemas/Todos"
+                        "schema": {
+                            "$ref": "#/components/schemas/Todos"
+                        }
                     }
                 },
                 "description": "a paged array of todo items",
                 "headers": {
-                    "X-Cursor": "#/components/parameters/cursor"
+                    "X-Cursor": {
+                        "$ref": "#/components/parameters/cursor"
+                    }
                 }
             }
         },
@@ -93,11 +101,21 @@
                     "updated": "2020-11-11T19:32:28Z"
                 },
                 "properties": {
-                    "body": "#/components/schemas/todoBody",
-                    "created": "#/components/schemas/dateTime",
-                    "id": "#/components/schemas/todoId",
-                    "status": "#/components/schemas/status",
-                    "updated": "#/components/schemas/dateTime"
+                    "body": {
+                        "$ref": "#/components/schemas/todoBody"
+                    },
+                    "created": {
+                        "$ref": "#/components/schemas/dateTime"
+                    },
+                    "id": {
+                        "$ref": "#/components/schemas/todoId"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/status"
+                    },
+                    "updated": {
+                        "$ref": "#/components/schemas/dateTime"
+                    }
                 },
                 "required": [
                     "body"
@@ -105,7 +123,9 @@
                 "type": "object"
             },
             "Todos": {
-                "items": "#/components/schemas/Todo",
+                "items": {
+                    "$ref": "#/components/schemas/Todo"
+                },
                 "type": "array"
             },
             "dateTime": {
@@ -152,7 +172,9 @@
                     "204": {
                         "description": "No content"
                     },
-                    "default": "#/components/responses/Error"
+                    "default": {
+                        "$ref": "#/components/responses/Error"
+                    }
                 },
                 "tags": [
                     "todo"
@@ -173,8 +195,12 @@
                     }
                 ],
                 "responses": {
-                    "200": "#/components/responses/Todo",
-                    "default": "#/components/responses/Error"
+                    "200": {
+                        "$ref": "#/components/responses/Todo"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/Error"
+                    }
                 },
                 "tags": [
                     "todo"
@@ -193,7 +219,9 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "status": "#/components/schemas/status"
+                                    "status": {
+                                        "$ref": "#/components/schemas/status"
+                                    }
                                 },
                                 "type": "object"
                             }
@@ -203,8 +231,12 @@
                     "required": true
                 },
                 "responses": {
-                    "200": "#/components/responses/Todo",
-                    "default": "#/components/responses/Error"
+                    "200": {
+                        "$ref": "#/components/responses/Todo"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/Error"
+                    }
                 },
                 "tags": [
                     "todo"
@@ -224,8 +256,12 @@
                     }
                 ],
                 "responses": {
-                    "200": "#/components/responses/Todos",
-                    "default": "#/components/responses/Error"
+                    "200": {
+                        "$ref": "#/components/responses/Todos"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/Error"
+                    }
                 },
                 "tags": [
                     "todos"
@@ -240,15 +276,21 @@
                             "example": {
                                 "body": "hello world"
                             },
-                            "schema": "#/components/schemas/Todo"
+                            "schema": {
+                                "$ref": "#/components/schemas/Todo"
+                            }
                         }
                     },
                     "description": "todo item to be posted",
                     "required": true
                 },
                 "responses": {
-                    "201": "#/components/responses/Todo",
-                    "default": "#/components/responses/Error"
+                    "201": {
+                        "$ref": "#/components/responses/Todo"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/Error"
+                    }
                 },
                 "tags": [
                     "todos"

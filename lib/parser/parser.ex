@@ -2,10 +2,11 @@ defmodule Quenya.Parser do
   @moduledoc """
   OpenAPI schema parser
   """
+  alias Quenya.Parser.{Validator, RemoteRef}
 
   @spec parse(binary) :: {:error, :parse | :read} | {:ok, map()}
   def parse(filename) do
-    case File.read(filename) do
+    case Validator.validate(filename) do
       {:ok, content} -> do_parse(content)
       {:error, _} -> {:error, :read}
     end
@@ -16,12 +17,14 @@ defmodule Quenya.Parser do
 
   defp do_parse(content) do
     case YamlElixir.read_all_from_string(content) do
-      {:ok, [data]} -> do_extend_ref(data)
+      {:ok, [data]} -> do_extend_refs(data)
       {:error, _} -> {:error, :parse}
     end
   end
 
-  defp do_extend_ref(data) do
+  defp do_extend_refs(data) do
+    data = RemoteRef.update(data)
+
     components =
       data
       |> Map.get("components")

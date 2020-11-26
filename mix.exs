@@ -38,7 +38,8 @@ defmodule Quenya.MixProject do
     [
       {:rustler, "~> 0.22.0-rc.0"},
       {:yaml_elixir, "~> 2.5"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:deep_merge, "~> 1.0"}
     ]
   end
 end
