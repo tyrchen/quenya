@@ -3,7 +3,7 @@ defmodule Quenya.Builder.Router do
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
-  alias Quenya.Builder.{Request, Util}
+  alias Quenya.Builder.{Request, Response, Util}
   alias QuenyaUtil.Plug.RoutePlug
 
   def gen(root, app, opts \\ []) do
@@ -48,6 +48,7 @@ defmodule Quenya.Builder.Router do
 
       new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
       Request.gen(doc, app, name, new_opts)
+      Response.gen(doc, app, name, new_opts)
 
       method = Util.normalize_name(method)
       init_opts = Util.gen_route_plug_opts(app, name)

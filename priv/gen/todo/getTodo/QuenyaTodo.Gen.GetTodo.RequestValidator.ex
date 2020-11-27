@@ -1,38 +1,48 @@
 defmodule QuenyaTodo.Gen.GetTodo.RequestValidator do
   @moduledoc false
-  alias ExJsonSchema.Validator
   require Logger
+  alias ExJsonSchema.Validator
   alias QuenyaUtil.RequestHelper
+  alias Plug.Conn
 
-  def validate(conn) do
-    name = "todoId"
-    position = "path"
-    required = true
+  def init(opts) do
+    opts
+  end
 
-    schema = %{
-      __struct__: ExJsonSchema.Schema.Root,
-      custom_format_validator: nil,
-      location: :root,
-      refs: %{},
-      schema: %{"format" => "uuid", "type" => "string"}
-    }
+  def call(conn, _opts) do
+    context = %{}
 
-    v = RequestHelper.get_param(conn, name, position)
+    data = [
+      {"todoId", "path", true,
+       {:%{}, [],
+        [
+          __struct__: ExJsonSchema.Schema.Root,
+          custom_format_validator: nil,
+          location: :root,
+          refs: {:%{}, [], []},
+          schema: {:%{}, [], [{"format", "uuid"}, {"type", "string"}]}
+        ]}}
+    ]
 
-    if(required) do
-      RequestHelper.validate_required(v, required, position)
-    end
+    context =
+      Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
+        v = RequestHelper.get_param(conn, name, position)
 
-    v = v || schema.schema["default"]
+        if(required) do
+          RequestHelper.validate_required(v, required, position)
+        end
 
-    case(Validator.validate(schema, v)) do
-      {:error, [{msg, _} | _]} ->
-        raise(Plug.BadRequestError, msg)
+        v = v || schema.schema["default"]
 
-      :ok ->
-        :ok
-    end
+        case(Validator.validate(schema, v)) do
+          {:error, [{msg, _} | _]} ->
+            raise(Plug.BadRequestError, msg)
 
-    :ok
+          :ok ->
+            Map.put(acc, name, v)
+        end
+      end)
+
+    Plug.Conn.assign(conn, :request_context, context)
   end
 end

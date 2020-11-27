@@ -43,7 +43,15 @@ defmodule Quenya.Builder.Util do
   def gen_route_plug_opts(app, name) do
     req_validate_mod = Module.concat("Elixir", gen_request_validator_name(app, name))
     res_validate_mod = Module.concat("Elixir", gen_response_validator_name(app, name))
-    [preprocessors: [req_validate_mod], post_processors: [res_validate_mod], handlers: []]
+
+    post_processors =
+      case Mix.env() == :prod do
+        true -> []
+        _ -> [res_validate_mod]
+      end
+
+    Module.concat("Elixir", gen_response_validator_name(app, name))
+    [preprocessors: [req_validate_mod], post_processors: post_processors, handlers: []]
   end
 
   def normalize_uri(uri) do

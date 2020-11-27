@@ -1,72 +1,67 @@
 defmodule QuenyaTodo.Gen.ListTodos.RequestValidator do
   @moduledoc false
-  alias ExJsonSchema.Validator
   require Logger
+  alias ExJsonSchema.Validator
   alias QuenyaUtil.RequestHelper
+  alias Plug.Conn
 
-  def validate(conn) do
-    name = "limit"
-    position = "query"
-    required = false
+  def init(opts) do
+    opts
+  end
 
-    schema = %{
-      __struct__: ExJsonSchema.Schema.Root,
-      custom_format_validator: nil,
-      location: :root,
-      refs: %{},
-      schema: %{
-        "default" => 10,
-        "format" => "int32",
-        "maximum" => 100,
-        "minimum" => 10,
-        "type" => "integer"
-      }
-    }
+  def call(conn, _opts) do
+    context = %{}
 
-    v = RequestHelper.get_param(conn, name, position)
+    data = [
+      {"limit", "query", false,
+       {:%{}, [],
+        [
+          __struct__: ExJsonSchema.Schema.Root,
+          custom_format_validator: nil,
+          location: :root,
+          refs: {:%{}, [], []},
+          schema:
+            {:%{}, [],
+             [
+               {"default", 10},
+               {"format", "int32"},
+               {"maximum", 100},
+               {"minimum", 10},
+               {"type", "integer"}
+             ]}
+        ]}},
+      {"filter", "query", false,
+       {:%{}, [],
+        [
+          __struct__: ExJsonSchema.Schema.Root,
+          custom_format_validator: nil,
+          location: :root,
+          refs: {:%{}, [], []},
+          schema:
+            {:%{}, [],
+             [{"default", "all"}, {"enum", ["all", "active", "completed"]}, {"type", "string"}]}
+        ]}}
+    ]
 
-    if(required) do
-      RequestHelper.validate_required(v, required, position)
-    end
+    context =
+      Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
+        v = RequestHelper.get_param(conn, name, position)
 
-    v = v || schema.schema["default"]
+        if(required) do
+          RequestHelper.validate_required(v, required, position)
+        end
 
-    case(Validator.validate(schema, v)) do
-      {:error, [{msg, _} | _]} ->
-        raise(Plug.BadRequestError, msg)
+        v = v || schema.schema["default"]
 
-      :ok ->
-        :ok
-    end
+        case(Validator.validate(schema, v)) do
+          {:error, [{msg, _} | _]} ->
+            raise(Plug.BadRequestError, msg)
 
-    name = "filter"
-    position = "query"
-    required = false
+          :ok ->
+            Map.put(acc, name, v)
+        end
+      end)
 
-    schema = %{
-      __struct__: ExJsonSchema.Schema.Root,
-      custom_format_validator: nil,
-      location: :root,
-      refs: %{},
-      schema: %{"default" => "all", "enum" => ["all", "active", "completed"], "type" => "string"}
-    }
-
-    v = RequestHelper.get_param(conn, name, position)
-
-    if(required) do
-      RequestHelper.validate_required(v, required, position)
-    end
-
-    v = v || schema.schema["default"]
-
-    case(Validator.validate(schema, v)) do
-      {:error, [{msg, _} | _]} ->
-        raise(Plug.BadRequestError, msg)
-
-      :ok ->
-        :ok
-    end
-
-    :ok
+    Plug.Conn.assign(conn, :request_context, context)
   end
 end

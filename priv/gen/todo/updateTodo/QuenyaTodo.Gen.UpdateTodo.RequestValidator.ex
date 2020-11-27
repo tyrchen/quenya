@@ -1,10 +1,17 @@
 defmodule QuenyaTodo.Gen.UpdateTodo.RequestValidator do
   @moduledoc false
-  alias ExJsonSchema.Validator
   require Logger
+  alias ExJsonSchema.Validator
   alias QuenyaUtil.RequestHelper
+  alias Plug.Conn
 
-  def validate(conn) do
+  def init(opts) do
+    opts
+  end
+
+  def call(conn, _opts) do
+    context = %{}
+
     schemas = %{
       "application/json" => %{
         __struct__: ExJsonSchema.Schema.Root,
@@ -38,6 +45,6 @@ defmodule QuenyaTodo.Gen.UpdateTodo.RequestValidator do
         :ok
     end
 
-    :ok
+    Plug.Conn.assign(conn, :request_context, context)
   end
 end
