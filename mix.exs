@@ -46,7 +46,7 @@ defmodule Quenya.MixProject do
       {:yaml_elixir, "~> 2.5"},
       {:jason, "~> 1.2"},
       {:deep_merge, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
+      {:plug, "~> 1.11"},
       {:recase, "~> 0.7"},
       {:ex_json_schema, "~> 0.7"},
       {:quenya_util, path: "../quenya_util"}

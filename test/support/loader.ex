@@ -2,7 +2,7 @@ defmodule Quenya.Loader do
   @moduledoc """
   Load the fixture file
   """
-  alias Quenya.{Parser, Builder.Request}
+  alias Quenya.{Parser, Builder.Router}
 
   def load(name) do
     {:ok, result} =
@@ -18,10 +18,11 @@ defmodule Quenya.Loader do
   def gen(data) do
     path = File.cwd!() |> Path.join("priv/gen")
 
-    Enum.each(data["paths"], fn {uri, ops} ->
-      Enum.each(ops, fn {method, _doc} ->
-        Request.gen(data, uri, method, :quenya_todo, path: Path.join(path, "request"))
-      end)
-    end)
+    Router.gen(data, :quenya_todo, path: Path.join(path, "todo"))
+    # Enum.each(data["paths"], fn {uri, ops} ->
+    #   Enum.each(ops, fn {method, _doc} ->
+    #     Request.gen(data, uri, method, :quenya_todo, path: Path.join(path, "request"))
+    #   end)
+    # end)
   end
 end

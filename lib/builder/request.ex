@@ -12,19 +12,13 @@ defmodule Quenya.Builder.Request do
   """
   require DynamicModule
 
-  alias Quenya.Builder.Utils
-  alias QuenyaUtil.RequestHelper
+  alias Quenya.Builder.Util
   alias ExJsonSchema.Schema
 
-  def gen(root, uri, method, app, opts \\ []) do
-    IO.puts("generating #{uri} #{method}")
-    doc = root["paths"][uri][method] || raise "No method #{method} defined for #{uri}"
+  def gen(doc, app, name, opts \\ []) do
+    IO.puts("generating request validator for  #{name}")
 
-    name =
-      doc["operationId"] ||
-        raise "Must define operationId for #{uri} with method #{method}. It will be used to generate module name"
-
-    mod_name = Utils.gen_module_name(app, "Gen", name, "RequestValidator")
+    mod_name = Util.gen_request_validator_name(app, name)
 
     preamble = gen_preamble()
 
@@ -56,7 +50,7 @@ defmodule Quenya.Builder.Request do
     Enum.map(params, fn p ->
       name = p["name"]
 
-      position = RequestHelper.ensure_position(p["in"])
+      position = Util.ensure_position(p["in"])
       required = p["required"] || false
       schema = p["schema"] |> Schema.resolve() |> Macro.escape()
 
