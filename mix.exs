@@ -9,7 +9,8 @@ defmodule Quenya.MixProject do
       start_permanent: Mix.env() == :prod,
       compilers: [:rustler] ++ Mix.compilers(),
       rustler_crates: rustler_crates(),
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -20,6 +21,10 @@ defmodule Quenya.MixProject do
       mod: {Quenya.Application, []}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:dev), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp rustler_crates do
     [
@@ -36,10 +41,15 @@ defmodule Quenya.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dynamic_module, "~> 0.1"},
       {:rustler, "~> 0.22.0-rc.0"},
       {:yaml_elixir, "~> 2.5"},
       {:jason, "~> 1.2"},
-      {:deep_merge, "~> 1.0"}
+      {:deep_merge, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"},
+      {:recase, "~> 0.7"},
+      {:ex_json_schema, "~> 0.7"},
+      {:quenya_util, path: "../quenya_util"}
     ]
   end
 end

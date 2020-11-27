@@ -21,9 +21,19 @@ post:
     content:
       application/json:
         schema:
-          $ref: "#/components/schemas/Todo"
+          type: object
+          properties:
+            title:
+              type: string
+              minLength: 3
+              maxLength: 64
+            body:
+              type: string
+              minLength: 3
+              maxLength: 140
+          required: [title]
         example:
-          body: "hello world"
+          title: "hello world"
   responses:
     "201":
       $ref: "#/components/responses/Todo"

@@ -15,11 +15,11 @@ tags:
 
 components:
   parameters:
-    $ref: "./todo/params.yml"
+    $ref: "./params.yml"
   schemas:
-    $ref: "./todo/schemas.yml"
+    $ref: "./schemas.yml"
   responses:
-    $ref: "./todo/responses.yml"
+    $ref: "./responses.yml"
   securitySchemes:
     token:
       type: http
@@ -28,6 +28,6 @@ components:
 
 paths:
   /todo/{todoId}:
-    $ref: "./todo/services/todo.yml"
+    $ref: "./services/todo.yml"
   /todos:
-    $ref: "./todo/services/todos.yml"
+    $ref: "./services/todos.yml"
