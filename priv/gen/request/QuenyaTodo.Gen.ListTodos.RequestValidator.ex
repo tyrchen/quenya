@@ -29,6 +29,8 @@ defmodule QuenyaTodo.Gen.ListTodos.RequestValidator do
       RequestHelper.validate_required(v, required, position)
     end
 
+    v = v || schema.schema["default"]
+
     case(Validator.validate(schema, v)) do
       {:error, [{msg, _} | _]} ->
         raise(Plug.BadRequestError, msg)
@@ -39,7 +41,7 @@ defmodule QuenyaTodo.Gen.ListTodos.RequestValidator do
 
     name = "filter"
     position = "query"
-    required = nil
+    required = false
 
     schema = %{
       __struct__: ExJsonSchema.Schema.Root,
@@ -54,6 +56,8 @@ defmodule QuenyaTodo.Gen.ListTodos.RequestValidator do
     if(required) do
       RequestHelper.validate_required(v, required, position)
     end
+
+    v = v || schema.schema["default"]
 
     case(Validator.validate(schema, v)) do
       {:error, [{msg, _} | _]} ->

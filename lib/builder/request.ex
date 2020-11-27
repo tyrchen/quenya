@@ -13,6 +13,7 @@ defmodule Quenya.Builder.Request do
   require DynamicModule
 
   alias Quenya.Builder.Utils
+  alias QuenyaUtil.RequestHelper
   alias ExJsonSchema.Schema
 
   def gen(root, uri, method, app, opts \\ []) do
@@ -55,13 +56,16 @@ defmodule Quenya.Builder.Request do
     Enum.map(params, fn p ->
       name = p["name"]
 
-      position = p["in"]
-      required = p["required"]
+      position = RequestHelper.ensure_position(p["in"])
+      required = p["required"] || false
       schema = p["schema"] |> Schema.resolve() |> Macro.escape()
 
       quote bind_quoted: [name: name, position: position, required: required, schema: schema] do
         v = RequestHelper.get_param(conn, name, position)
         if required, do: RequestHelper.validate_required(v, required, position)
+
+        # add default value if v is null
+        v = v || schema.schema["default"]
 
         case Validator.validate(schema, v) do
           {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
