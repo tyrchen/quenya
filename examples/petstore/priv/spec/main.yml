@@ -663,7 +663,7 @@ components:
 
           items:
             type: string
-            format: uri
+            format: image_uri
         tags:
           type: array
 
