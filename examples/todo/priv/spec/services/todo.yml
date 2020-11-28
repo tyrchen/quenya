@@ -1,0 +1,47 @@
+get:
+  operationId: getTodo
+  tags: [todo]
+  description: get a todo item
+  x-services:
+    - name: GetTodo
+  parameters:
+    - name: todoId
+      in: path
+      required: true
+      description: The id of the pet to retrieve
+      schema:
+        $ref: "#/components/schemas/todoId"
+  responses:
+    "200":
+      $ref: "#/components/responses/Todo"
+    default:
+      $ref: "#/components/responses/Error"
+
+delete:
+  operationId: deleteTodo
+  tags: [todo]
+  description: delete a todo item
+  responses:
+    "204":
+      description: No content
+    default:
+      $ref: "#/components/responses/Error"
+patch:
+  operationId: updateTodo
+  tags: [todo]
+  description: update todo status
+  requestBody:
+    description: todo item status
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              $ref: "#/components/schemas/status"
+  responses:
+    "200":
+      $ref: "#/components/responses/Todo"
+    default:
+      $ref: "#/components/responses/Error"

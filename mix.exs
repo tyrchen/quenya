@@ -18,7 +18,12 @@ defmodule Quenya.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Quenya.Application, []}
+      mod: {Quenya.Application, []},
+      env: [
+        use_fake_handler: true,
+        use_response_validator: true,
+        apis: %{}
+      ]
     ]
   end
 
@@ -43,7 +48,6 @@ defmodule Quenya.MixProject do
     [
       {:dynamic_module, "~> 0.1"},
       {:rustler, "~> 0.22.0-rc.0"},
-      {:yaml_elixir, "~> 2.5"},
       {:jason, "~> 1.2"},
       {:deep_merge, "~> 1.0"},
       {:plug, "~> 1.11"},

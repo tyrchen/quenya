@@ -45,7 +45,7 @@ defmodule Quenya.Builder.ResponseGenerator do
 
       _ ->
         quote bind_quoted: [schemas: schemas |> Macro.escape()] do
-          schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
+          {code, schemas_with_code} = Util.choose_best_code_schema(schemas)
 
           conn =
             Enum.reduce(schemas_with_code, conn, fn {name, schema}, acc ->
@@ -59,30 +59,7 @@ defmodule Quenya.Builder.ResponseGenerator do
   defp gen_body(resp) do
     schemas = Util.get_response_schemas(resp, "content")
 
-    {code, schema} =
-      case schemas["200"] do
-        nil ->
-          status =
-            schemas
-            |> Map.keys()
-            |> Enum.reduce_while(nil, fn item, _acc ->
-              case item do
-                "2" <> _ -> {:halt, item}
-                _ -> {:cont, item}
-              end
-            end) || "200"
-
-          code =
-            case status do
-              "default" -> 200
-              _ -> String.to_integer(status)
-            end
-
-          {code, schemas[status]}
-
-        v ->
-          {200, v}
-      end
+    {code, schema} = Util.choose_best_code_schema(schemas)
 
     case schema do
       nil ->
@@ -108,7 +85,7 @@ defmodule Quenya.Builder.ResponseGenerator do
                 "accept content type #{inspect(accepts)} is not supported"
               )
 
-          content_type = Keyword.get(schema, :content_type, "application/json") |> IO.inspect()
+          content_type = Keyword.get(schema, :content_type, "application/json")
           resp = JsonDataFaker.generate(schema[:schema]) || ""
 
           conn

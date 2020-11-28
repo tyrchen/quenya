@@ -61,6 +61,32 @@ defmodule Quenya.Builder.Util do
     end)
   end
 
+  def choose_best_code_schema(schemas) do
+    case schemas["200"] do
+      nil ->
+        status =
+          schemas
+          |> Map.keys()
+          |> Enum.reduce_while(nil, fn item, _acc ->
+            case item do
+              "2" <> _ -> {:halt, item}
+              _ -> {:cont, item}
+            end
+          end) || "200"
+
+        code =
+          case status do
+            "default" -> 200
+            _ -> String.to_integer(status)
+          end
+
+        {code, schemas[status]}
+
+      v ->
+        {200, v}
+    end
+  end
+
   def get_api_config(name) do
     config = Application.get_all_env(:quenya)[:apis][name] || %{}
 

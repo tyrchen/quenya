@@ -1,6 +1,6 @@
-defmodule Petstore do
+defmodule Todo do
   @moduledoc """
-  Generate Petstore code based on spec
+  Generate todo code based on spec
   """
 
   {:ok, spec} =
@@ -9,5 +9,5 @@ defmodule Petstore do
     |> QuenyaUtil.Parser.parse()
 
   path = File.cwd!() |> Path.join("gen")
-  Quenya.Builder.Router.gen(spec, :petstore, path: path)
+  Quenya.Builder.Router.gen(spec, :todo, path: path)
 end

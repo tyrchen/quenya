@@ -36,7 +36,6 @@ defmodule Quenya.Builder.Router do
       require Logger
       alias QuenyaUtil.Plug.{RoutePlug, SwaggerPlug, MathAllPlug}
 
-      plug(Plug.Static, at: "/swagger", from: {unquote(app), "priv/spec"})
       plug(Plug.Static, at: "/public", from: {:quenya_util, "priv/swagger"})
 
       plug(Plug.Logger, log: :info)
@@ -65,7 +64,8 @@ defmodule Quenya.Builder.Router do
         Plug.Conn.send_resp(conn, conn.status, "Internal server error")
       end
 
-      get("/swagger", to: SwaggerPlug, init_opts: [spec: "/swagger/main.yml"])
+      get("/swagger/main.json", to: SwaggerPlug, init_opts: [app: unquote(app)])
+      get("/swagger", to: SwaggerPlug, init_opts: [spec: "/swagger/main.json"])
     end
   end
 

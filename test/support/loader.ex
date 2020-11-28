@@ -2,7 +2,8 @@ defmodule Quenya.Loader do
   @moduledoc """
   Load the fixture file
   """
-  alias Quenya.{Parser, Builder.Router}
+  alias QuenyaUtil.Parser
+  alias Quenya.Builder.Router
 
   def load(name) do
     {:ok, result} =

@@ -1,0 +1,34 @@
+openapi: 3.0.0
+info:
+  title: Todo API
+  description: |
+    Hello world! This is a __Sample API__ for todo API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+    description: Local dev server
+  - url: https://api.todo.mvc/v1
+    description: Production server
+
+tags:
+  - name: todos
+  - name: todo
+
+components:
+  parameters:
+    $ref: "./params.yml"
+  schemas:
+    $ref: "./schemas.yml"
+  responses:
+    $ref: "./responses.yml"
+  securitySchemes:
+    token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /todo/{todoId}:
+    $ref: "./services/todo.yml"
+  /todos:
+    $ref: "./services/todos.yml"
