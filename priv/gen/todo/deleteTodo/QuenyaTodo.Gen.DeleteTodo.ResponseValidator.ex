@@ -10,42 +10,25 @@ defmodule QuenyaTodo.Gen.DeleteTodo.ResponseValidator do
   end
 
   def validate(conn) do
-    schemas = %{"204" => %{}, "default" => %{}}
-    schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
-
-    Enum.map(schemas_with_code, fn {name, {schema, required}} ->
-      v = RequestHelper.get_param(conn, name, "resp_header")
-
-      if(required) do
-        RequestHelper.validate_required(v, required, "resp_header")
-      end
-
-      case(Validator.validate(schema, v)) do
-        {:error, [{msg, _} | _]} ->
-          raise(Plug.BadRequestError, msg)
-
-        :ok ->
-          :ok
-      end
-    end)
-
     schemas = %{
-      "204" => %{},
       "default" => %{
-        "application/json" => %{
-          __struct__: ExJsonSchema.Schema.Root,
-          custom_format_validator: nil,
-          location: :root,
-          refs: %{},
+        "application/json" => [
           schema: %{
-            "properties" => %{
-              "code" => %{"format" => "int32", "type" => "integer"},
-              "message" => %{"type" => "string"}
-            },
-            "required" => ["code", "message"],
-            "type" => "object"
-          }
-        }
+            __struct__: ExJsonSchema.Schema.Root,
+            custom_format_validator: nil,
+            location: :root,
+            refs: %{},
+            schema: %{
+              "properties" => %{
+                "code" => %{"format" => "int32", "type" => "integer"},
+                "message" => %{"type" => "string"}
+              },
+              "required" => ["code", "message"],
+              "type" => "object"
+            }
+          },
+          required: false
+        ]
       }
     }
 
@@ -66,7 +49,7 @@ defmodule QuenyaTodo.Gen.DeleteTodo.ResponseValidator do
 
     data = conn.resp_body
 
-    case(Validator.validate(schema, data)) do
+    case(Validator.validate(schema[:schema], data)) do
       {:error, [{msg, _} | _]} ->
         raise(Plug.BadRequestError, msg)
 

@@ -1,4 +1,4 @@
-defmodule Quenya.Builder.Response do
+defmodule Quenya.Builder.ResponseValidator do
   @moduledoc """
   Build response validator module
 
@@ -14,7 +14,6 @@ defmodule Quenya.Builder.Response do
   require DynamicModule
 
   alias Quenya.Builder.Util
-  alias ExJsonSchema.Schema
 
   def gen(doc, app, name, opts \\ []) do
     IO.puts("generating request validator for  #{name}")
@@ -51,33 +50,34 @@ defmodule Quenya.Builder.Response do
     end
   end
 
-  defp gen_header_validators(nil), do: nil
+  defp gen_header_validators(nil) do
+    quote do
+    end
+  end
 
   defp gen_header_validators(resp) do
-    schemas =
-      Enum.reduce(resp, %{}, fn {code, body}, acc1 ->
-        result1 =
-          Enum.reduce(body["headers"] || %{}, %{}, fn {header_name, v}, acc2 ->
-            result2 = Schema.resolve(v["schema"])
-            Map.put(acc2, header_name, {result2, v["required"] || false})
-          end)
+    schemas = Util.get_response_schemas(resp, "headers")
 
-        Map.put(acc1, code, result1)
-      end)
-      |> Macro.escape()
-
-    quote bind_quoted: [schemas: schemas] do
-      schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
-
-      Enum.map(schemas_with_code, fn {name, {schema, required}} ->
-        v = RequestHelper.get_param(conn, name, "resp_header")
-        if required, do: RequestHelper.validate_required(v, required, "resp_header")
-
-        case Validator.validate(schema, v) do
-          {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
-          :ok -> :ok
+    case Enum.empty?(schemas) do
+      true ->
+        quote do
         end
-      end)
+
+      _ ->
+        quote bind_quoted: [schemas: schemas |> Macro.escape()] do
+          schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
+
+          Enum.map(schemas_with_code, fn {name, schema} ->
+            v = RequestHelper.get_param(conn, name, "resp_header")
+            required = schema[:required]
+            if required, do: RequestHelper.validate_required(v, required, "resp_header")
+
+            case Validator.validate(schema[:schema], v) do
+              {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
+              :ok -> :ok
+            end
+          end)
+        end
     end
   end
 
@@ -88,15 +88,7 @@ defmodule Quenya.Builder.Response do
 
   defp gen_body_validators(resp) do
     schemas =
-      Enum.reduce(resp, %{}, fn {code, body}, acc1 ->
-        result1 =
-          Enum.reduce(body["content"] || %{}, %{}, fn {k, v}, acc2 ->
-            result2 = Schema.resolve(v["schema"])
-            Map.put(acc2, k, result2)
-          end)
-
-        Map.put(acc1, code, result1)
-      end)
+      Util.get_response_schemas(resp, "content")
       |> Macro.escape()
 
     quote bind_quoted: [schemas: schemas] do
@@ -117,7 +109,7 @@ defmodule Quenya.Builder.Response do
 
       data = conn.resp_body
 
-      case Validator.validate(schema, data) do
+      case Validator.validate(schema[:schema], data) do
         {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
         :ok -> :ok
       end

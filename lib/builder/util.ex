@@ -3,6 +3,8 @@ defmodule Quenya.Builder.Util do
   General utility functions for code generator
   """
 
+  alias ExJsonSchema.Schema
+
   @allowed_param_position ["query", "path", "header", "cookie"]
 
   def gen_module_name(app, prefix, name, postfix \\ "") do
@@ -29,6 +31,10 @@ defmodule Quenya.Builder.Util do
     gen_module_name(app, "Gen", name, "Plug")
   end
 
+  def gen_fake_handler_name(app, name) do
+    gen_module_name(app, "Gen", name, "FakeHandler")
+  end
+
   def gen_router_name(app) do
     gen_module_name(app, "Gen", "Router")
   end
@@ -40,18 +46,25 @@ defmodule Quenya.Builder.Util do
     end
   end
 
-  def gen_route_plug_opts(app, name) do
-    req_validate_mod = Module.concat("Elixir", gen_request_validator_name(app, name))
-    res_validate_mod = Module.concat("Elixir", gen_response_validator_name(app, name))
+  def get_response_schemas(resp, position) do
+    Enum.reduce(resp, %{}, fn {code, body}, acc1 ->
+      result1 =
+        Enum.reduce(body[position] || %{}, %{}, fn {k, v}, acc2 ->
+          result2 = Schema.resolve(Map.delete(v["schema"], "example"))
+          Map.put(acc2, k, schema: result2, required: v["required"] || false)
+        end)
 
-    post_processors =
-      case Mix.env() == :prod do
-        true -> []
-        _ -> [res_validate_mod]
+      case Enum.empty?(result1) do
+        true -> acc1
+        _ -> Map.put(acc1, code, result1)
       end
+    end)
+  end
 
-    Module.concat("Elixir", gen_response_validator_name(app, name))
-    [preprocessors: [req_validate_mod], post_processors: post_processors, handlers: []]
+  def get_api_config(name) do
+    config = Application.get_all_env(:quenya)[:apis][name] || %{}
+
+    {config[:preprocessors] || [], config[:handlers] || [], config[:postprocessors] || []}
   end
 
   def normalize_uri(uri) do

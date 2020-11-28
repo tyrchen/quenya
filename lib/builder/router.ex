@@ -3,7 +3,7 @@ defmodule Quenya.Builder.Router do
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
-  alias Quenya.Builder.{Request, Response, Util}
+  alias Quenya.Builder.{RequestValidator, ResponseValidator, ResponseGenerator, Util}
   alias QuenyaUtil.Plug.RoutePlug
 
   def gen(root, app, opts \\ []) do
@@ -47,11 +47,15 @@ defmodule Quenya.Builder.Router do
           raise "Must define operationId for #{uri} with method #{method}. It will be used to generate module name"
 
       new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
-      Request.gen(doc, app, name, new_opts)
-      Response.gen(doc, app, name, new_opts)
+      RequestValidator.gen(doc, app, name, new_opts)
+      ResponseValidator.gen(doc, app, name, new_opts)
+
+      if Application.fetch_env!(:quenya, :use_response_validator) do
+        ResponseGenerator.gen(doc, app, name, new_opts)
+      end
 
       method = Util.normalize_name(method)
-      init_opts = Util.gen_route_plug_opts(app, name)
+      init_opts = gen_route_plug_opts(app, name)
 
       result =
         quote do
@@ -60,5 +64,29 @@ defmodule Quenya.Builder.Router do
 
       result
     end)
+  end
+
+  defp gen_route_plug_opts(app, name) do
+    config = Application.get_all_env(:quenya)
+    {preprocessors, handlers, postprocessors} = Util.get_api_config(name)
+    req_validator_mod = Module.concat("Elixir", Util.gen_request_validator_name(app, name))
+    res_validator_mod = Module.concat("Elixir", Util.gen_response_validator_name(app, name))
+    fake_handler_mod = Module.concat("Elixir", Util.gen_fake_handler_name(app, name))
+
+    preprocessors = [req_validator_mod | preprocessors]
+
+    postprocessors =
+      case config[:use_response_validator] do
+        true -> [res_validator_mod | postprocessors]
+        _ -> postprocessors
+      end
+
+    handlers =
+      case config[:use_fake_handler] do
+        true -> [fake_handler_mod | handlers]
+        _ -> handlers
+      end
+
+    [preprocessors: preprocessors, postprocessors: postprocessors, handlers: handlers]
   end
 end

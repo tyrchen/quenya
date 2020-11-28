@@ -12,6 +12,6 @@ defmodule QuenyaTodo.Gen.DeleteTodo.RequestValidator do
   def call(conn, _opts) do
     context = %{}
 
-    Plug.Conn.assign(conn, :request_context, context)
+    Conn.assign(conn, :request_context, context)
   end
 end

@@ -62,6 +62,6 @@ defmodule QuenyaTodo.Gen.ListTodos.RequestValidator do
         end
       end)
 
-    Plug.Conn.assign(conn, :request_context, context)
+    Conn.assign(conn, :request_context, context)
   end
 end

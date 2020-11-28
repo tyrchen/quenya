@@ -12,28 +12,30 @@ defmodule QuenyaTodo.Gen.ListTodos.ResponseValidator do
   def validate(conn) do
     schemas = %{
       "200" => %{
-        "X-Cursor" =>
-          {%{
-             __struct__: ExJsonSchema.Schema.Root,
-             custom_format_validator: nil,
-             location: :root,
-             refs: %{},
-             schema: %{"type" => "string"}
-           }, true}
-      },
-      "default" => %{}
+        "X-Cursor" => [
+          schema: %{
+            __struct__: ExJsonSchema.Schema.Root,
+            custom_format_validator: nil,
+            location: :root,
+            refs: %{},
+            schema: %{"type" => "string"}
+          },
+          required: true
+        ]
+      }
     }
 
     schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
 
-    Enum.map(schemas_with_code, fn {name, {schema, required}} ->
+    Enum.map(schemas_with_code, fn {name, schema} ->
       v = RequestHelper.get_param(conn, name, "resp_header")
+      required = schema[:required]
 
       if(required) do
         RequestHelper.validate_required(v, required, "resp_header")
       end
 
-      case(Validator.validate(schema, v)) do
+      case(Validator.validate(schema[:schema], v)) do
         {:error, [{msg, _} | _]} ->
           raise(Plug.BadRequestError, msg)
 
@@ -44,49 +46,55 @@ defmodule QuenyaTodo.Gen.ListTodos.ResponseValidator do
 
     schemas = %{
       "200" => %{
-        "application/json" => %{
-          __struct__: ExJsonSchema.Schema.Root,
-          custom_format_validator: nil,
-          location: :root,
-          refs: %{},
+        "application/json" => [
           schema: %{
-            "items" => %{
-              "example" => %{
-                "body" => "hello world!",
-                "created" => "2020-11-11T17:32:28Z",
-                "id" => "16ba8d00-d44c-4f61-841f-2da8221091bc",
-                "status" => "active",
-                "updated" => "2020-11-11T19:32:28Z"
+            __struct__: ExJsonSchema.Schema.Root,
+            custom_format_validator: nil,
+            location: :root,
+            refs: %{},
+            schema: %{
+              "items" => %{
+                "example" => %{
+                  "body" => "hello world!",
+                  "created" => "2020-11-11T17:32:28Z",
+                  "id" => "16ba8d00-d44c-4f61-841f-2da8221091bc",
+                  "status" => "active",
+                  "updated" => "2020-11-11T19:32:28Z"
+                },
+                "properties" => %{
+                  "body" => %{"maxLength" => 140, "minLength" => 3, "type" => "string"},
+                  "created" => %{"format" => "date-time", "type" => "string"},
+                  "id" => %{"format" => "uuid", "type" => "string"},
+                  "status" => %{"enum" => ["active", "completed"], "type" => "string"},
+                  "updated" => %{"format" => "date-time", "type" => "string"}
+                },
+                "required" => ["body"],
+                "type" => "object"
               },
-              "properties" => %{
-                "body" => %{"maxLength" => 140, "minLength" => 3, "type" => "string"},
-                "created" => %{"format" => "date-time", "type" => "string"},
-                "id" => %{"format" => "uuid", "type" => "string"},
-                "status" => %{"enum" => ["active", "completed"], "type" => "string"},
-                "updated" => %{"format" => "date-time", "type" => "string"}
-              },
-              "required" => ["body"],
-              "type" => "object"
-            },
-            "type" => "array"
-          }
-        }
+              "type" => "array"
+            }
+          },
+          required: false
+        ]
       },
       "default" => %{
-        "application/json" => %{
-          __struct__: ExJsonSchema.Schema.Root,
-          custom_format_validator: nil,
-          location: :root,
-          refs: %{},
+        "application/json" => [
           schema: %{
-            "properties" => %{
-              "code" => %{"format" => "int32", "type" => "integer"},
-              "message" => %{"type" => "string"}
-            },
-            "required" => ["code", "message"],
-            "type" => "object"
-          }
-        }
+            __struct__: ExJsonSchema.Schema.Root,
+            custom_format_validator: nil,
+            location: :root,
+            refs: %{},
+            schema: %{
+              "properties" => %{
+                "code" => %{"format" => "int32", "type" => "integer"},
+                "message" => %{"type" => "string"}
+              },
+              "required" => ["code", "message"],
+              "type" => "object"
+            }
+          },
+          required: false
+        ]
       }
     }
 
@@ -107,7 +115,7 @@ defmodule QuenyaTodo.Gen.ListTodos.ResponseValidator do
 
     data = conn.resp_body
 
-    case(Validator.validate(schema, data)) do
+    case(Validator.validate(schema[:schema], data)) do
       {:error, [{msg, _} | _]} ->
         raise(Plug.BadRequestError, msg)
 

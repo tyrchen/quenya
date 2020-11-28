@@ -9,8 +9,8 @@ defmodule QuenyaTodo.Gen.Router do
     to: RoutePlug,
     init_opts: [
       preprocessors: [QuenyaTodo.Gen.DeleteTodo.RequestValidator],
-      post_processors: [QuenyaTodo.Gen.DeleteTodo.ResponseValidator],
-      handlers: []
+      postprocessors: [QuenyaTodo.Gen.DeleteTodo.ResponseValidator],
+      handlers: [QuenyaTodo.Gen.DeleteTodo.FakeHandler]
     ]
   )
 
@@ -18,8 +18,8 @@ defmodule QuenyaTodo.Gen.Router do
     to: RoutePlug,
     init_opts: [
       preprocessors: [QuenyaTodo.Gen.GetTodo.RequestValidator],
-      post_processors: [QuenyaTodo.Gen.GetTodo.ResponseValidator],
-      handlers: []
+      postprocessors: [QuenyaTodo.Gen.GetTodo.ResponseValidator],
+      handlers: [QuenyaTodo.Gen.GetTodo.FakeHandler]
     ]
   )
 
@@ -27,8 +27,8 @@ defmodule QuenyaTodo.Gen.Router do
     to: RoutePlug,
     init_opts: [
       preprocessors: [QuenyaTodo.Gen.UpdateTodo.RequestValidator],
-      post_processors: [QuenyaTodo.Gen.UpdateTodo.ResponseValidator],
-      handlers: []
+      postprocessors: [QuenyaTodo.Gen.UpdateTodo.ResponseValidator],
+      handlers: [QuenyaTodo.Gen.UpdateTodo.FakeHandler]
     ]
   )
 
@@ -36,8 +36,8 @@ defmodule QuenyaTodo.Gen.Router do
     to: RoutePlug,
     init_opts: [
       preprocessors: [QuenyaTodo.Gen.ListTodos.RequestValidator],
-      post_processors: [QuenyaTodo.Gen.ListTodos.ResponseValidator],
-      handlers: []
+      postprocessors: [QuenyaTodo.Gen.ListTodos.ResponseValidator],
+      handlers: [QuenyaTodo.Gen.ListTodos.FakeHandler]
     ]
   )
 
@@ -45,8 +45,8 @@ defmodule QuenyaTodo.Gen.Router do
     to: RoutePlug,
     init_opts: [
       preprocessors: [QuenyaTodo.Gen.CreateTodo.RequestValidator],
-      post_processors: [QuenyaTodo.Gen.CreateTodo.ResponseValidator],
-      handlers: []
+      postprocessors: [QuenyaTodo.Gen.CreateTodo.ResponseValidator],
+      handlers: [QuenyaTodo.Gen.CreateTodo.FakeHandler]
     ]
   )
 end

@@ -1,4 +1,4 @@
-defmodule Quenya.Builder.Request do
+defmodule Quenya.Builder.RequestValidator do
   @moduledoc """
   Build request validator module
 
@@ -32,7 +32,7 @@ defmodule Quenya.Builder.Request do
           context = %{}
           unquote(param_validator)
           unquote(body_validator)
-          Plug.Conn.assign(conn, :request_context, context)
+          Conn.assign(conn, :request_context, context)
         end
       end
 

@@ -10,67 +10,47 @@ defmodule QuenyaTodo.Gen.UpdateTodo.ResponseValidator do
   end
 
   def validate(conn) do
-    schemas = %{"200" => %{}, "default" => %{}}
-    schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
-
-    Enum.map(schemas_with_code, fn {name, {schema, required}} ->
-      v = RequestHelper.get_param(conn, name, "resp_header")
-
-      if(required) do
-        RequestHelper.validate_required(v, required, "resp_header")
-      end
-
-      case(Validator.validate(schema, v)) do
-        {:error, [{msg, _} | _]} ->
-          raise(Plug.BadRequestError, msg)
-
-        :ok ->
-          :ok
-      end
-    end)
-
     schemas = %{
       "200" => %{
-        "application/json" => %{
-          __struct__: ExJsonSchema.Schema.Root,
-          custom_format_validator: nil,
-          location: :root,
-          refs: %{},
+        "application/json" => [
           schema: %{
-            "example" => %{
-              "body" => "hello world!",
-              "created" => "2020-11-11T17:32:28Z",
-              "id" => "16ba8d00-d44c-4f61-841f-2da8221091bc",
-              "status" => "active",
-              "updated" => "2020-11-11T19:32:28Z"
-            },
-            "properties" => %{
-              "body" => %{"maxLength" => 140, "minLength" => 3, "type" => "string"},
-              "created" => %{"format" => "date-time", "type" => "string"},
-              "id" => %{"format" => "uuid", "type" => "string"},
-              "status" => %{"enum" => ["active", "completed"], "type" => "string"},
-              "updated" => %{"format" => "date-time", "type" => "string"}
-            },
-            "required" => ["body"],
-            "type" => "object"
-          }
-        }
+            __struct__: ExJsonSchema.Schema.Root,
+            custom_format_validator: nil,
+            location: :root,
+            refs: %{},
+            schema: %{
+              "properties" => %{
+                "body" => %{"maxLength" => 140, "minLength" => 3, "type" => "string"},
+                "created" => %{"format" => "date-time", "type" => "string"},
+                "id" => %{"format" => "uuid", "type" => "string"},
+                "status" => %{"enum" => ["active", "completed"], "type" => "string"},
+                "updated" => %{"format" => "date-time", "type" => "string"}
+              },
+              "required" => ["body"],
+              "type" => "object"
+            }
+          },
+          required: false
+        ]
       },
       "default" => %{
-        "application/json" => %{
-          __struct__: ExJsonSchema.Schema.Root,
-          custom_format_validator: nil,
-          location: :root,
-          refs: %{},
+        "application/json" => [
           schema: %{
-            "properties" => %{
-              "code" => %{"format" => "int32", "type" => "integer"},
-              "message" => %{"type" => "string"}
-            },
-            "required" => ["code", "message"],
-            "type" => "object"
-          }
-        }
+            __struct__: ExJsonSchema.Schema.Root,
+            custom_format_validator: nil,
+            location: :root,
+            refs: %{},
+            schema: %{
+              "properties" => %{
+                "code" => %{"format" => "int32", "type" => "integer"},
+                "message" => %{"type" => "string"}
+              },
+              "required" => ["code", "message"],
+              "type" => "object"
+            }
+          },
+          required: false
+        ]
       }
     }
 
@@ -91,7 +71,7 @@ defmodule QuenyaTodo.Gen.UpdateTodo.ResponseValidator do
 
     data = conn.resp_body
 
-    case(Validator.validate(schema, data)) do
+    case(Validator.validate(schema[:schema], data)) do
       {:error, [{msg, _} | _]} ->
         raise(Plug.BadRequestError, msg)
 
