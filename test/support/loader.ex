@@ -7,7 +7,7 @@ defmodule Quenya.Loader do
   def load(name) do
     {:ok, result} =
       File.cwd!()
-      |> Path.join("priv/fixture/#{name}/main.yml")
+      |> Path.join("test/fixture/#{name}/main.yml")
       |> Parser.parse()
 
     result
@@ -16,7 +16,7 @@ defmodule Quenya.Loader do
   def gen, do: gen(load("todo"))
 
   def gen(data) do
-    path = File.cwd!() |> Path.join("priv/gen")
+    path = File.cwd!() |> Path.join("gen")
 
     Router.gen(data, :quenya_todo, path: Path.join(path, "todo"))
     # Enum.each(data["paths"], fn {uri, ops} ->

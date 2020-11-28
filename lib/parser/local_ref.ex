@@ -12,9 +12,10 @@ defmodule Quenya.Parser.LocalRef do
     with {:ok, comp} <- Map.fetch(data, "components"),
          {:ok, comp1} <- do_extend_components(comp, "schemas"),
          {:ok, comp2} <- do_extend_components(comp1, "parameters"),
-         {:ok, comp3} <- do_extend_components(comp2, "responses"),
-         {:ok, paths} <- do_extend_paths(comp3, Map.get(data, "paths")) do
-      {:ok, %{data | "components" => comp3, "paths" => paths}}
+         {:ok, comp3} <- do_extend_components(comp2, "requestBodies"),
+         {:ok, comp4} <- do_extend_components(comp3, "responses"),
+         {:ok, paths} <- do_extend_paths(comp4, Map.get(data, "paths")) do
+      {:ok, %{data | "components" => comp4, "paths" => paths}}
     else
       e -> e
     end
@@ -28,7 +29,7 @@ defmodule Quenya.Parser.LocalRef do
       end
 
     updated =
-      Enum.reduce_while(data[type], %{}, fn {k, v}, acc ->
+      Enum.reduce_while(data[type] || %{}, %{}, fn {k, v}, acc ->
         result =
           Util.update_map(
             data,

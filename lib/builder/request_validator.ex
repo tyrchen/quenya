@@ -17,8 +17,6 @@ defmodule Quenya.Builder.RequestValidator do
   alias ExJsonSchema.Schema
 
   def gen(doc, app, name, opts \\ []) do
-    IO.puts("generating request validator for  #{name}")
-
     mod_name = Util.gen_request_validator_name(app, name)
 
     preamble = gen_preamble()
@@ -65,7 +63,7 @@ defmodule Quenya.Builder.RequestValidator do
 
         position = Util.ensure_position(p["in"])
         required = p["required"] || false
-        schema = p["schema"] |> Schema.resolve() |> Macro.escape()
+        schema = p["schema"] |> Schema.resolve()
         {name, position, required, schema}
       end)
       |> Macro.escape()
@@ -73,7 +71,8 @@ defmodule Quenya.Builder.RequestValidator do
     quote bind_quoted: [data: data] do
       context =
         Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
-          v = RequestHelper.get_param(conn, name, position)
+          v = RequestHelper.get_param(conn, name, position, schema.schema)
+
           if required, do: RequestHelper.validate_required(v, required, position)
 
           # add default value if v is null

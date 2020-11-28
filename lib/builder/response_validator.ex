@@ -16,8 +16,6 @@ defmodule Quenya.Builder.ResponseValidator do
   alias Quenya.Builder.Util
 
   def gen(doc, app, name, opts \\ []) do
-    IO.puts("generating request validator for  #{name}")
-
     mod_name = Util.gen_response_validator_name(app, name)
 
     preamble = gen_preamble()
@@ -27,7 +25,7 @@ defmodule Quenya.Builder.ResponseValidator do
 
     contents =
       quote do
-        def validate(conn) do
+        def call(conn, _opts) do
           unquote(header_validator)
           unquote(body_validator)
           conn
@@ -68,7 +66,7 @@ defmodule Quenya.Builder.ResponseValidator do
           schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
 
           Enum.map(schemas_with_code, fn {name, schema} ->
-            v = RequestHelper.get_param(conn, name, "resp_header")
+            v = RequestHelper.get_param(conn, name, "resp_header", schemas[:schema])
             required = schema[:required]
             if required, do: RequestHelper.validate_required(v, required, "resp_header")
 
@@ -96,7 +94,7 @@ defmodule Quenya.Builder.ResponseValidator do
       schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
 
       schema =
-        Enum.reduce_while(accepts, nil, fn type, acc ->
+        Enum.reduce_while(accepts, nil, fn type, _acc ->
           case Map.get(schemas_with_code, type) do
             nil -> {:cont, nil}
             v -> {:halt, v}

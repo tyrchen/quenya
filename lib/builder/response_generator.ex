@@ -6,8 +6,6 @@ defmodule Quenya.Builder.ResponseGenerator do
   alias Quenya.Builder.Util
 
   def gen(doc, app, name, opts \\ []) do
-    IO.puts("generating fake handler for #{name}.")
-
     mod_name = Util.gen_fake_handler_name(app, name)
 
     preamble = gen_preamble()
@@ -16,7 +14,7 @@ defmodule Quenya.Builder.ResponseGenerator do
 
     contents =
       quote do
-        def validate(conn) do
+        def call(conn, _opts) do
           unquote(header)
           unquote(body)
         end
@@ -28,7 +26,7 @@ defmodule Quenya.Builder.ResponseGenerator do
   def gen_preamble do
     quote do
       require Logger
-      alias QuenyaUtil.RequestHelper
+      alias QuenyaUtil.{RequestHelper, ResponseHelper}
       alias Plug.Conn
 
       def init(opts) do
@@ -72,7 +70,7 @@ defmodule Quenya.Builder.ResponseGenerator do
                 "2" <> _ -> {:halt, item}
                 _ -> {:cont, item}
               end
-            end)
+            end) || "200"
 
           code =
             case status do
@@ -95,21 +93,27 @@ defmodule Quenya.Builder.ResponseGenerator do
         quote bind_quoted: [schemas_with_code: Macro.escape(schema), code: code] do
           accepts = RequestHelper.get_accept(conn)
 
-          {content_type, schema} =
-            Enum.reduce_while(accepts, nil, fn type, acc ->
-              case Map.get(schemas_with_code, type) do
-                nil -> {:cont, {type, nil}}
-                v -> {:halt, {type, v}}
+          schema =
+            Enum.reduce_while(accepts, nil, fn type, _acc ->
+              case(Map.get(schemas_with_code, type)) do
+                nil ->
+                  {:cont, nil}
+
+                v ->
+                  {:halt, Keyword.put(v, :content_type, type)}
               end
-            end) || {"application/json", schemas_with_code["application/json"]} ||
+            end) || schemas_with_code["application/json"] ||
               raise(
                 Plug.BadRequestError,
                 "accept content type #{inspect(accepts)} is not supported"
               )
 
-          Plug.Conn.put_resp_content_type(conn, content_type)
+          content_type = Keyword.get(schema, :content_type, "application/json") |> IO.inspect()
           resp = JsonDataFaker.generate(schema[:schema]) || ""
-          Plug.Conn.send_resp(conn, code, resp)
+
+          conn
+          |> Plug.Conn.put_resp_content_type(content_type)
+          |> Plug.Conn.send_resp(code, ResponseHelper.encode(content_type, resp))
         end
     end
   end

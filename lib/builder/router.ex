@@ -4,15 +4,14 @@ defmodule Quenya.Builder.Router do
   """
   require DynamicModule
   alias Quenya.Builder.{RequestValidator, ResponseValidator, ResponseGenerator, Util}
-  alias QuenyaUtil.Plug.RoutePlug
+  alias QuenyaUtil.Plug.{RoutePlug, MathAllPlug}
 
   def gen(root, app, opts \\ []) do
-    IO.puts("generating router.")
     doc = root["paths"] || raise "No route definition in schema"
 
-    mod_name = Util.gen_router_name(app) |> IO.inspect()
+    mod_name = Util.gen_router_name(app)
 
-    preamble = gen_preamble()
+    preamble = gen_preamble(app)
 
     contents =
       Enum.map(doc, fn {uri, ops} ->
@@ -20,12 +19,28 @@ defmodule Quenya.Builder.Router do
       end)
       |> List.flatten()
 
-    DynamicModule.gen(mod_name, preamble, contents, opts)
+    suffix = [
+      quote do
+        match(_, to: MathAllPlug, init_opts: [])
+      end
+    ]
+
+    DynamicModule.gen(mod_name, preamble, contents ++ suffix, opts)
   end
 
-  defp gen_preamble do
+  defp gen_preamble(app) do
     quote do
       use Plug.Router
+      use Plug.ErrorHandler
+
+      require Logger
+      alias QuenyaUtil.Plug.{RoutePlug, SwaggerPlug, MathAllPlug}
+
+      plug(Plug.Static, at: "/swagger", from: {unquote(app), "priv/spec"})
+      plug(Plug.Static, at: "/public", from: {:quenya_util, "priv/swagger"})
+
+      plug(Plug.Logger, log: :info)
+
       plug(:match)
 
       plug(Plug.Parsers,
@@ -35,6 +50,22 @@ defmodule Quenya.Builder.Router do
       )
 
       plug(:dispatch)
+
+      def handle_errors(conn, %{kind: _kind, reason: %{message: msg} = reason, stack: _stack}) do
+        Plug.Conn.send_resp(conn, conn.status, msg)
+      end
+
+      def handle_errors(conn, %{kind: kind, reason: reason, stack: stack}) do
+        Logger.warn(
+          "Internal error:\n kind: #{inspect(kind)}\n reason: #{inspect(reason)}\n stack: #{
+            inspect(stack)
+          }"
+        )
+
+        Plug.Conn.send_resp(conn, conn.status, "Internal server error")
+      end
+
+      get("/swagger", to: SwaggerPlug, init_opts: [spec: "/swagger/main.yml"])
     end
   end
 
@@ -48,9 +79,12 @@ defmodule Quenya.Builder.Router do
 
       new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
       RequestValidator.gen(doc, app, name, new_opts)
-      ResponseValidator.gen(doc, app, name, new_opts)
 
       if Application.fetch_env!(:quenya, :use_response_validator) do
+        ResponseValidator.gen(doc, app, name, new_opts)
+      end
+
+      if Application.fetch_env!(:quenya, :use_fake_handler) do
         ResponseGenerator.gen(doc, app, name, new_opts)
       end
 
