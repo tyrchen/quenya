@@ -38,7 +38,7 @@ defmodule QuenyaBuilder.Router do
     uri =
       Util.get_localhost_uri(servers) || raise "Must define localhost under servers in OAS3 spec."
 
-    path = uri.path
+    path = uri.path || "/"
     api_router_mod = Module.concat("Elixir", Util.gen_api_router_name(app))
 
     Util.gen_router_preamble() ++
