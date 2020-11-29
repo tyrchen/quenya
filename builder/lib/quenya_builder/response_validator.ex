@@ -5,7 +5,7 @@ defmodule QuenyaBuilder.ResponseValidator do
   Usage:
 
   ```elixir
-  {:ok, root} = QuenyaUtil.Parser.parse("todo.yml")
+  {:ok, root} = Quenya.Parser.parse("todo.yml")
   doc = root["paths"]["/todos"]["get"]
   # generate response validator for GET /todos
   QuenyaBuilder.Response.gen(doc, :awesome_app, "listTodos")
@@ -41,7 +41,7 @@ defmodule QuenyaBuilder.ResponseValidator do
       import Plug.Conn
 
       alias ExJsonSchema.Validator
-      alias QuenyaUtil.RequestHelper
+      alias Quenya.RequestHelper
 
       def init(opts) do
         opts

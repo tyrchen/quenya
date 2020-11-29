@@ -40,7 +40,7 @@ defmodule <%= @app_module %>.MixProject do
       {:plug_cowboy, "~> 2.0"},
 
       # Quenya utility
-      {:quenya_util, git: "git@github.com:tyrchen/quenya_util"},
+      {:quenya, git: "git@github.com:tyrchen/quenya_util"},
 
       # Only needed if you'd like to generate fake handler
       {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"},

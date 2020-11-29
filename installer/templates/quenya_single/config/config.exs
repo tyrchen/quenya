@@ -8,13 +8,13 @@
 import Config
 
 # Configures quenya API pipelines
-config :quenya_util,
+config :quenya,
   use_fake_handler: true,
   use_response_validator: false,
   apis: %{}
 
-# Configures ex_json_schema to use QuenyaUtil.FormatValidator for unkown format
-config :ex_json_schema, :custom_format_validator, {QuenyaUtil.FormatValidator, :validate}
+# Configures ex_json_schema to use Quenya.FormatValidator for unkown format
+config :ex_json_schema, :custom_format_validator, {Quenya.FormatValidator, :validate}
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -24,13 +24,13 @@ defmodule QuenyaBuilder.Router do
       use Plug.ErrorHandler
 
       require Logger
-      alias QuenyaUtil.Plug.{SwaggerPlug, MathAllPlug}
+      alias Quenya.Plug.{SwaggerPlug, MathAllPlug}
 
-      alias QuenyaUtil.Plug.{SwaggerPlug, MathAllPlug}
+      alias Quenya.Plug.{SwaggerPlug, MathAllPlug}
 
       plug(Plug.Logger, log: :info)
 
-      plug(Plug.Static, at: "/public", from: {:quenya_util, "priv/swagger"})
+      plug(Plug.Static, at: "/public", from: {:quenya, "priv/swagger"})
     end
   end
 

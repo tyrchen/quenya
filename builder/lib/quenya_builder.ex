@@ -3,7 +3,7 @@ defmodule QuenyaBuilder do
   Build API routes based on OpenAPI v3 spec
   """
 
-  alias QuenyaUtil.Parser
+  alias Quenya.Parser
   alias QuenyaBuilder.Router
 
   @doc """

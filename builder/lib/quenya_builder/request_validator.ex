@@ -5,7 +5,7 @@ defmodule QuenyaBuilder.RequestValidator do
   Usage:
 
   ```elixir
-  {:ok, root} = QuenyaUtil.Parser.parse("todo.yml")
+  {:ok, root} = Quenya.Parser.parse("todo.yml")
   doc = root["paths"]["/todos"]["get"]
   # generate request validator for GET /todos
   QuenyaBuilder.Request.gen(doc, :awesome_app, "listTodos")
@@ -69,9 +69,9 @@ defmodule QuenyaBuilder.RequestValidator do
     quote bind_quoted: [data: data] do
       context =
         Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
-          v = QuenyaUtil.RequestHelper.get_param(conn, name, position, schema.schema)
+          v = Quenya.RequestHelper.get_param(conn, name, position, schema.schema)
 
-          if required, do: QuenyaUtil.RequestHelper.validate_required(v, required, position)
+          if required, do: Quenya.RequestHelper.validate_required(v, required, position)
 
           # add default value if v is null
           v = v || schema.schema["default"]
@@ -98,7 +98,7 @@ defmodule QuenyaBuilder.RequestValidator do
       |> Macro.escape()
 
     quote bind_quoted: [schemas: schemas] do
-      content_type = QuenyaUtil.RequestHelper.get_content_type(conn)
+      content_type = Quenya.RequestHelper.get_content_type(conn)
       data = conn.body_params
 
       schema =

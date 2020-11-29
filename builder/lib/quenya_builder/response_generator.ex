@@ -28,7 +28,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
       require Logger
       import Plug.Conn
 
-      alias QuenyaUtil.{RequestHelper, ResponseHelper}
+      alias Quenya.{RequestHelper, ResponseHelper}
 
       def init(opts) do
         opts
