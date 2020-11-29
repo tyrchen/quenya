@@ -5,7 +5,7 @@ defmodule QuenyaBuilder.MixProject do
   def project do
     [
       app: :quenya_builder,
-      version: @version
+      version: @version,
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps()
