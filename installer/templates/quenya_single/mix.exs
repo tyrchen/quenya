@@ -39,14 +39,14 @@ defmodule <%= @app_module %>.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
 
-      # Quenya utility
-      {:quenya, git: "git@github.com:tyrchen/quenya_util"},
-
-      # Only needed if you'd like to generate fake handler
-      {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"},
+      # Quenya
+      {:quenya, git: "git@github.com:tyrchen/quenya", branch: "feature/merge-quenya-util"},
 
       # Quenya builder
-      {:quenya, git: "git@github.com:tyrchen/quenya", runtime: false},
+      {:quenya_builder, git: "git@github.com:tyrchen/quenya", sparse: "builder", runtime: false},
+
+      # Only needed if you'd like to generate fake handler
+      {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"}
     ]
   end
 end
