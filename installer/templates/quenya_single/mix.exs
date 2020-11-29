@@ -11,7 +11,7 @@ defmodule <%= @app_module %>.MixProject do
       lockfile: "../../mix.lock",<% end %>
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: Mix.compilers() ++ [:quenya],
+      compilers: [:quenya] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
