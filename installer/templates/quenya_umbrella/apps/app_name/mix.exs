@@ -40,7 +40,7 @@ defmodule <%= @app_module %>.MixProject do
       {:plug_cowboy, "~> 2.0"},
 
       # Quenya
-      {:quenya, git: "git@github.com:tyrchen/quenya", branch: "feature/merge-quenya-util"},
+      {:quenya, git: "git@github.com:tyrchen/quenya"},
 
       # Quenya builder
       {:quenya_builder, git: "git@github.com:tyrchen/quenya", sparse: "builder", runtime: false},

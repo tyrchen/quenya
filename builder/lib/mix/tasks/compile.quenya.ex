@@ -1,9 +1,9 @@
 defmodule Mix.Tasks.Compile.Quenya do
   @moduledoc """
-  Generate source code based on OpenAPI v3 sepc for <%= @app_name %>.
+  Generate source code based on OpenAPI v3 sepc for todo.
   This will create a `/gen` folder and overwrite all files in it.
   The files are generated based on `operationId` in the spec
-  <%= @app_module %> keeps the contexts that define your domain
+  Todo keeps the contexts that define your domain
   and business logic.
 
   Contexts are also responsible for managing your data, regardless
@@ -12,12 +12,14 @@ defmodule Mix.Tasks.Compile.Quenya do
   use Mix.Task
 
   def run(_args) do
+    {:ok, _} = Application.ensure_all_started(:quenya)
     build_spec()
   end
 
   defp build_spec do
     cwd = File.cwd!()
     filename = Path.join(cwd, "priv/spec/main.yml")
-    QuenyaBuilder.run(filename, :<%= @app_name %>)
+    app = Mix.Project.config()[:app]
+    QuenyaBuilder.run(filename, app)
   end
 end
