@@ -63,7 +63,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
       nil ->
         quote do
           conn
-          |> send_resp(code, "")
+          |> send_resp(unquote(code), "")
         end
 
       _ ->
