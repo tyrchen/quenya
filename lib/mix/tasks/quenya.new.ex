@@ -105,7 +105,6 @@ defmodule Mix.Tasks.Quenya.New do
     |> validate_project(path)
     |> generator.generate()
     |> copy_spec_file(filename)
-    |> build_spec()
     |> prompt_to_install_deps(generator, path)
   end
 
@@ -140,17 +139,6 @@ defmodule Mix.Tasks.Quenya.New do
       true -> File.cp_r!(filename, path)
       _ -> File.copy!(filename, Path.join(path, "main.yml"))
     end
-
-    project
-  end
-
-  defp build_spec(%Project{} = project) do
-    filename = Path.join(project.app_path, "priv/spec/main.yml")
-    {:ok, spec} = QuenyaUtil.Parser.parse(filename)
-
-    Quenya.Builder.Router.gen(spec, String.to_atom(project.app),
-      path: Path.join(project.app_path, "gen")
-    )
 
     project
   end

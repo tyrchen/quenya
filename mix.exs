@@ -34,10 +34,10 @@ defmodule Quenya.MixProject do
       {:plug, "~> 1.11"},
       {:recase, "~> 0.7"},
       {:ex_json_schema, "~> 0.7"},
-      {:quenya_util, path: "../quenya_util"},
-      {:json_data_faker, path: "../json_data_faker"}
-      # {:quenya_util, git: "git@github.com:tyrchen/quenya_util"},
-      # {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"}
+      # {:quenya_util, path: "../quenya_util"},
+      # {:json_data_faker, path: "../json_data_faker"}
+      {:quenya_util, git: "git@github.com:tyrchen/quenya_util"},
+      {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"}
     ]
   end
 end
