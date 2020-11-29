@@ -1,19 +1,19 @@
-defmodule Quenya.Builder.ResponseValidator do
+defmodule QuenyaBuilder.ResponseValidator do
   @moduledoc """
   Build response validator module
 
   Usage:
 
   ```elixir
-  {:ok, root} = Quenya.Parser.parse("todo.yml")
+  {:ok, root} = QuenyaUtil.Parser.parse("todo.yml")
   doc = root["paths"]["/todos"]["get"]
   # generate response validator for GET /todos
-  Quenya.Builder.Response.gen(doc, :awesome_app, "listTodos")
+  QuenyaBuilder.Response.gen(doc, :awesome_app, "listTodos")
   ```
   """
   require DynamicModule
 
-  alias Quenya.Builder.Util
+  alias QuenyaBuilder.Util
 
   def gen(doc, app, name, opts \\ []) do
     mod_name = Util.gen_response_validator_name(app, name)

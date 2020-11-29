@@ -1,4 +1,4 @@
-defmodule Quenya.Builder.Util do
+defmodule QuenyaBuilder.Util do
   @moduledoc """
   General utility functions for code generator
   """

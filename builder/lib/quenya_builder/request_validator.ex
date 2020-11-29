@@ -1,19 +1,19 @@
-defmodule Quenya.Builder.RequestValidator do
+defmodule QuenyaBuilder.RequestValidator do
   @moduledoc """
   Build request validator module
 
   Usage:
 
   ```elixir
-  {:ok, root} = Quenya.Parser.parse("todo.yml")
+  {:ok, root} = QuenyaUtil.Parser.parse("todo.yml")
   doc = root["paths"]["/todos"]["get"]
   # generate request validator for GET /todos
-  Quenya.Builder.Request.gen(doc, :awesome_app, "listTodos")
+  QuenyaBuilder.Request.gen(doc, :awesome_app, "listTodos")
   ```
   """
   require DynamicModule
 
-  alias Quenya.Builder.Util
+  alias QuenyaBuilder.Util
   alias ExJsonSchema.Schema
 
   def gen(doc, app, name, opts \\ []) do

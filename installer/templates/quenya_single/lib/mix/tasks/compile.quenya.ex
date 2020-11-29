@@ -18,15 +18,6 @@ defmodule Mix.Tasks.Compile.Quenya do
   defp build_spec do
     cwd = File.cwd!()
     filename = Path.join(cwd, "priv/spec/main.yml")
-    case QuenyaUtil.Parser.parse(filename) do
-      {:ok, spec} ->
-        Quenya.Builder.Router.gen(spec, :<%= @app_name %>, path: Path.join(cwd, "gen"), create: false, output: false)
-        :ok
-      error -> error
-    end
-
-
-
-
+    QuenyaBuilder.run(filename, :<%= @app_name %>)
   end
 end

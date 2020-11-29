@@ -1,9 +1,9 @@
-defmodule Quenya.Builder.Router do
+defmodule QuenyaBuilder.Router do
   @moduledoc """
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
-  alias Quenya.Builder.{ApiRouter, Util}
+  alias QuenyaBuilder.{ApiRouter, Util}
 
   def gen(root, app, opts \\ []) do
     doc = root["paths"] || raise "No route definition in schema"

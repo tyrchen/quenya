@@ -1,9 +1,9 @@
-defmodule Quenya.Builder.ApiRouter do
+defmodule QuenyaBuilder.ApiRouter do
   @moduledoc """
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
-  alias Quenya.Builder.{RequestValidator, ResponseValidator, ResponseGenerator, Util}
+  alias QuenyaBuilder.{RequestValidator, ResponseValidator, ResponseGenerator, Util}
 
   def gen(doc, app, opts \\ []) do
     mod_name = Util.gen_api_router_name(app)

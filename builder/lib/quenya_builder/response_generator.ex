@@ -1,9 +1,9 @@
-defmodule Quenya.Builder.ResponseGenerator do
+defmodule QuenyaBuilder.ResponseGenerator do
   @moduledoc """
   Generate fake handler for response
   """
   require DynamicModule
-  alias Quenya.Builder.Util
+  alias QuenyaBuilder.Util
 
   def gen(doc, app, name, opts \\ []) do
     mod_name = Util.gen_fake_handler_name(app, name)

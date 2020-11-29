@@ -1,9 +1,9 @@
-defmodule Quenya.Builder.Plug do
+defmodule QuenyaBuilder.Plug do
   @moduledoc """
   Generate method plug
   """
   require DynamicModule
-  alias Quenya.Builder.Util
+  alias QuenyaBuilder.Util
 
   def gen(_doc, app, name, opts \\ []) do
     IO.puts("generating plug for #{name}.")
