@@ -26,8 +26,9 @@ defmodule Quenya.Builder.ResponseGenerator do
   def gen_preamble do
     quote do
       require Logger
+      import Plug.Conn
+
       alias QuenyaUtil.{RequestHelper, ResponseHelper}
-      alias Plug.Conn
 
       def init(opts) do
         opts
@@ -37,6 +38,7 @@ defmodule Quenya.Builder.ResponseGenerator do
 
   defp gen_header(resp) do
     schemas = Util.get_response_schemas(resp, "headers")
+    {_code, schemas_with_code} = Util.choose_best_code_schema(schemas)
 
     case Enum.empty?(schemas) do
       true ->
@@ -44,13 +46,11 @@ defmodule Quenya.Builder.ResponseGenerator do
         end
 
       _ ->
-        quote bind_quoted: [schemas: schemas |> Macro.escape()] do
-          {code, schemas_with_code} = Util.choose_best_code_schema(schemas)
-
+        quote bind_quoted: [schemas_with_code: Macro.escape(schemas_with_code)] do
           conn =
             Enum.reduce(schemas_with_code, conn, fn {name, schema}, acc ->
               v = JsonDataFaker.generate(schema[:schema])
-              Conn.put_resp_header(acc, name, v)
+              put_resp_header(acc, name, v)
             end)
         end
     end
@@ -89,8 +89,8 @@ defmodule Quenya.Builder.ResponseGenerator do
           resp = JsonDataFaker.generate(schema[:schema]) || ""
 
           conn
-          |> Plug.Conn.put_resp_content_type(content_type)
-          |> Plug.Conn.send_resp(code, ResponseHelper.encode(content_type, resp))
+          |> put_resp_content_type(content_type)
+          |> send_resp(code, ResponseHelper.encode(content_type, resp))
         end
     end
   end

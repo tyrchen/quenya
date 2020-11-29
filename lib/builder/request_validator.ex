@@ -30,7 +30,7 @@ defmodule Quenya.Builder.RequestValidator do
           context = %{}
           unquote(param_validator)
           unquote(body_validator)
-          Conn.assign(conn, :request_context, context)
+          assign(conn, :request_context, context)
         end
       end
 
@@ -40,9 +40,7 @@ defmodule Quenya.Builder.RequestValidator do
   defp gen_preamble do
     quote do
       require Logger
-      alias ExJsonSchema.Validator
-      alias QuenyaUtil.RequestHelper
-      alias Plug.Conn
+      import Plug.Conn
 
       def init(opts) do
         opts
@@ -71,14 +69,14 @@ defmodule Quenya.Builder.RequestValidator do
     quote bind_quoted: [data: data] do
       context =
         Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
-          v = RequestHelper.get_param(conn, name, position, schema.schema)
+          v = QuenyaUtil.RequestHelper.get_param(conn, name, position, schema.schema)
 
-          if required, do: RequestHelper.validate_required(v, required, position)
+          if required, do: QuenyaUtil.RequestHelper.validate_required(v, required, position)
 
           # add default value if v is null
           v = v || schema.schema["default"]
 
-          case Validator.validate(schema, v) do
+          case ExJsonSchema.Validator.validate(schema, v) do
             {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
             :ok -> Map.put(acc, name, v)
           end
@@ -100,7 +98,7 @@ defmodule Quenya.Builder.RequestValidator do
       |> Macro.escape()
 
     quote bind_quoted: [schemas: schemas] do
-      content_type = RequestHelper.get_content_type(conn)
+      content_type = QuenyaUtil.RequestHelper.get_content_type(conn)
       data = conn.body_params
 
       schema =
@@ -112,7 +110,7 @@ defmodule Quenya.Builder.RequestValidator do
             }"
           )
 
-      case Validator.validate(schema, data) do
+      case ExJsonSchema.Validator.validate(schema, data) do
         {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
         :ok -> :ok
       end

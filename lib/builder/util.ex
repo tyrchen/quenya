@@ -39,6 +39,19 @@ defmodule Quenya.Builder.Util do
     gen_module_name(app, "Gen", "Router")
   end
 
+  def gen_api_router_name(app) do
+    gen_module_name(app, "Gen", "ApiRouter")
+  end
+
+  def get_localhost_uri(servers) do
+    Enum.reduce_while(servers, nil, fn %{"url" => url}, _acc ->
+      case URI.parse(url) do
+        %URI{host: "localhost"} = uri -> {:halt, uri}
+        _ -> {:cont, nil}
+      end
+    end)
+  end
+
   def ensure_position(position) do
     case position in @allowed_param_position do
       true -> position
@@ -85,6 +98,36 @@ defmodule Quenya.Builder.Util do
       v ->
         {200, v}
     end
+  end
+
+  def gen_router_preamble do
+    [
+      quote do
+        plug(:match)
+
+        plug(Plug.Parsers,
+          parsers: [:json],
+          pass: ["application/json"],
+          json_decoder: Jason
+        )
+
+        plug(:dispatch)
+
+        def handle_errors(conn, %{kind: _kind, reason: %{message: msg}, stack: _stack}) do
+          Plug.Conn.send_resp(conn, conn.status, msg)
+        end
+
+        def handle_errors(conn, %{kind: kind, reason: reason, stack: stack}) do
+          Logger.warn(
+            "Internal error:\n kind: #{inspect(kind)}\n reason: #{inspect(reason)}\n stack: #{
+              inspect(stack)
+            }"
+          )
+
+          Plug.Conn.send_resp(conn, conn.status, "Internal server error")
+        end
+      end
+    ]
   end
 
   def get_api_config(name) do

@@ -38,9 +38,10 @@ defmodule Quenya.Builder.ResponseValidator do
   defp gen_preamble do
     quote do
       require Logger
+      import Plug.Conn
+
       alias ExJsonSchema.Validator
       alias QuenyaUtil.RequestHelper
-      alias Plug.Conn
 
       def init(opts) do
         opts
