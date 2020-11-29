@@ -1,6 +1,6 @@
 import Config
 
-config :quenya,
+config :quenya_util,
   use_fake_handler: true,
   use_response_validator: false,
   apis: %{}

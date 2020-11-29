@@ -17,12 +17,7 @@ defmodule Quenya.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Quenya.Application, []},
-      env: [
-        use_fake_handler: true,
-        use_response_validator: true,
-        apis: %{}
-      ]
+      mod: {Quenya.Application, []}
     ]
   end
 

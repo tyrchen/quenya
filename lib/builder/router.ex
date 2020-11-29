@@ -80,11 +80,11 @@ defmodule Quenya.Builder.Router do
       new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
       RequestValidator.gen(doc, app, name, new_opts)
 
-      if Application.fetch_env!(:quenya, :use_response_validator) do
+      if Application.get_env(:quenya_util, :use_response_validator) do
         ResponseValidator.gen(doc, app, name, new_opts)
       end
 
-      if Application.fetch_env!(:quenya, :use_fake_handler) do
+      if Application.get_env(:quenya_util, :use_fake_handler) do
         ResponseGenerator.gen(doc, app, name, new_opts)
       end
 
@@ -101,7 +101,7 @@ defmodule Quenya.Builder.Router do
   end
 
   defp gen_route_plug_opts(app, name) do
-    config = Application.get_all_env(:quenya)
+    config = Application.get_all_env(:quenya_util)
     {preprocessors, handlers, postprocessors} = Util.get_api_config(name)
     req_validator_mod = Module.concat("Elixir", Util.gen_request_validator_name(app, name))
     res_validator_mod = Module.concat("Elixir", Util.gen_response_validator_name(app, name))
