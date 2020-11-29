@@ -5,4 +5,4 @@ config :logger, level: :warn
 
 # Configures application server port
 config :<%= @app_name %>,
-  http: [port: 4001],
+  http: [port: 4001]

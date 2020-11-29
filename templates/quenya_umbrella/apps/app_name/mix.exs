@@ -12,7 +12,7 @@ defmodule <%= @app_module %>.MixProject do
       elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      compilers: [:quenya] ++ Mix.compilers(),
+      compilers: Mix.compilers() ++ [:quenya],
       deps: deps()
     ]
   end
