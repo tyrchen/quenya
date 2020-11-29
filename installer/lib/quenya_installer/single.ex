@@ -12,10 +12,6 @@ defmodule QuenyaInstaller.Single do
     {:eex, "quenya_single/config/test.exs", :project, "config/test.exs"},
 
     # application files
-    {:eex, "quenya_single/lib/mix/tasks/compile.quenya.ex", :project,
-     "lib/mix/tasks/compile.quenya.ex"},
-
-    # mix task files
     {:eex, "quenya_single/lib/app_name/application.ex", :project, "lib/:app/application.ex"},
     {:eex, "quenya_single/lib/app_name.ex", :project, "lib/:app.ex"},
 
