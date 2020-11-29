@@ -37,7 +37,7 @@ defmodule QuenyaBuilder.MixProject do
       {:plug, "~> 1.11"},
       {:recase, "~> 0.7"},
       {:ex_json_schema, "~> 0.7"},
-      {:quenya, git: "git@github.com:tyrchen/quenya"},
+      {:quenya, "~> 0.2"},
       {:json_data_faker, "~> 0.1"},
 
       # dev/test deps
