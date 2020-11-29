@@ -23,3 +23,5 @@ erl_crash.dump
 quenya-*.tar
 
 /gen
+
+/quenya

@@ -1,27 +1,20 @@
-defmodule Mix.Tasks.Quenya.Build do
+defmodule Quenya.CLI.Build do
   @moduledoc """
   Rebuild code for a given Quenya project.
 
   It will overwrite code generated in `/gen` based on spec in `/priv/spec/main.yml`.
-
-  ## Examples
-
-      mix quenya.build
-
   """
-  use Mix.Task
   alias Quenya.{Project, Generator}
 
-  @shortdoc "Generate spec for an existing quenya app"
-
-  def run(_argv) do
+  def run(_args, _opts) do
     spec_file = Path.join(File.cwd!(), "priv/spec/main.yml")
 
     case File.exists?(spec_file) do
       true ->
-        config = Mix.Project.config()
+        [{mod, _}] = Code.compile_file("mix.exs")
+        config = apply(mod, :project, [])
         # TODO: support umbrella project later
-        project = %Project{app: config[:app], app_path: "./"}
+        project = %Project{app: Atom.to_string(config[:app]), app_path: "./"}
         Generator.build_spec(project)
 
         Mix.shell().info([

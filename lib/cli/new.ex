@@ -1,99 +1,16 @@
-defmodule Mix.Tasks.Quenya.New do
+defmodule Quenya.CLI.New do
   @moduledoc """
   Creates a new Quenya project.
-
-  It expects the path of the project as an argument.
-
-      mix quenya.new SPEC PATH [--module MODULE] [--app APP]
-
-  A project at the given PATH will be created based on the spec.
-  The application name and module name will be retrieved
-  from the path, unless `--module` or `--app` is given.
-
-  ## Options
-
-    * `--umbrella` - generate an umbrella project,
-      with one application for your domain, and
-      a second application for the web interface.
-
-    * `--app` - the name of the OTP application
-
-    * `--module` - the name of the base module in
-      the generated skeleton
-
-    * `--verbose` - use verbose output
-
-
-  ## Installation
-
-  `mix quenya.new` by default prompts you to fetch and install your
-  dependencies. You can enable this behaviour by passing the
-  `--install` flag or disable it with the `--no-install` flag.
-
-  ## Examples
-
-      mix quenya.new todo.yml todo
-
-  Is equivalent to:
-
-      mix quenya.new todo.yml todo --module Todo
-
-  As an umbrella:
-
-      mix quenya.new todo.yml todo --umbrella
-
-  Would generate the following directory structure and modules:
-
-      todo_umbrella/   Todo.Umbrella
-        apps/
-          todo/        todo app
-
-  You can read more about umbrella projects using the
-  official [Elixir guide](http://elixir-lang.org/getting-started/mix-otp/dependencies-and-umbrella-apps.html#umbrella-projects)
-
-  To print the Quenya installer version, pass `-v` or `--version`, for example:
-
-      mix quenya.new -v
   """
-  use Mix.Task
   alias Quenya.{Generator, Project, Single, Umbrella}
 
   @version Mix.Project.config()[:version]
-  @shortdoc "Creates a new Quenya v#{@version} application"
 
-  @switches [
-    dev: :boolean,
-    app: :string,
-    module: :string,
-    umbrella: :boolean,
-    verbose: :boolean,
-    install: :boolean
-  ]
-
-  def run([version]) when version in ~w(-v --version) do
-    Mix.shell().info("Quenya v#{@version}")
-  end
-
-  def run(argv) do
+  def run(args, opts) do
     elixir_version_check!()
 
-    case parse_opts(argv) do
-      {_opts, []} ->
-        Mix.Tasks.Help.run(["quenya.new"])
-
-      {opts, [filename, base_path | _]} ->
-        generator = if opts[:umbrella], do: Umbrella, else: Single
-        generate(filename, base_path, generator, :project_path, opts)
-    end
-  end
-
-  def run(argv, generator, path) do
-    elixir_version_check!()
-
-    case parse_opts(argv) do
-      {_opts, []} -> Mix.Tasks.Help.run(["quenya.new"])
-      {opts, [filename, base_path | _]} -> generate(filename, base_path, generator, path, opts)
-    end
+    generator = if opts[:umbrella], do: Umbrella, else: Single
+    generate(args[:file], args[:path], generator, :project_path, opts)
   end
 
   def generate(filename, base_path, generator, path, opts) do
@@ -146,19 +63,6 @@ defmodule Mix.Tasks.Quenya.New do
   end
 
   defp maybe_cd(path, func), do: path && File.cd!(path, func)
-
-  defp parse_opts(argv) do
-    case OptionParser.parse(argv, strict: @switches) do
-      {opts, argv, []} ->
-        {opts, argv}
-
-      {_opts, _argv, [switch | _]} ->
-        Mix.raise("Invalid option: " <> switch_to_string(switch))
-    end
-  end
-
-  defp switch_to_string({name, nil}), do: name
-  defp switch_to_string({name, val}), do: name <> "=" <> val
 
   defp install_mix(project, install?) do
     maybe_cmd(project, "mix deps.get", true, install? && hex_available?())
