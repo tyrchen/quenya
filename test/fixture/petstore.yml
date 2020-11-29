@@ -180,6 +180,8 @@ paths:
             type: integer
             format: int64
       responses:
+        "200":
+          description: updated
         "405":
           description: Invalid input
       security:
@@ -218,6 +220,8 @@ paths:
             type: integer
             format: int64
       responses:
+        "204":
+          description: No content
         "400":
           description: Invalid pet value
       security:
@@ -351,6 +355,8 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: No content
         "400":
           description: Invalid ID supplied
         "404":
@@ -363,7 +369,7 @@ paths:
       description: This can only be done by the logged in user.
       operationId: createUser
       responses:
-        default:
+        "201":
           description: successful operation
       security:
         - api_key: []
@@ -382,7 +388,7 @@ paths:
       description: ""
       operationId: createUsersWithArrayInput
       responses:
-        default:
+        "201":
           description: successful operation
       security:
         - api_key: []
@@ -396,7 +402,7 @@ paths:
       description: ""
       operationId: createUsersWithListInput
       responses:
-        default:
+        "201":
           description: successful operation
       security:
         - api_key: []
@@ -458,7 +464,7 @@ paths:
       description: ""
       operationId: logoutUser
       responses:
-        default:
+        "204":
           description: successful operation
       security:
         - api_key: []

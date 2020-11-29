@@ -24,9 +24,7 @@ defmodule QuenyaBuilder.Router do
       use Plug.ErrorHandler
 
       require Logger
-      alias Quenya.Plug.{SwaggerPlug, MathAllPlug}
-
-      alias Quenya.Plug.{SwaggerPlug, MathAllPlug}
+      alias Quenya.Plug.SwaggerPlug
 
       plug(Plug.Logger, log: :info)
 
@@ -55,7 +53,7 @@ defmodule QuenyaBuilder.Router do
 
       end]
       _ -> [quote do
-        match(_, to: MathAllPlug, init_opts: [])
+        match(_, to: Quenya.Plug.MathAllPlug, init_opts: [])
       end]
     end
     Util.gen_router_preamble() ++ routes ++ match_all

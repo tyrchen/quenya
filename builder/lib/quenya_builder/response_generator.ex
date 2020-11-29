@@ -28,8 +28,6 @@ defmodule QuenyaBuilder.ResponseGenerator do
       require Logger
       import Plug.Conn
 
-      alias Quenya.ResponseHelper
-
       def init(opts) do
         opts
       end
@@ -64,6 +62,8 @@ defmodule QuenyaBuilder.ResponseGenerator do
     case schema do
       nil ->
         quote do
+          conn
+          |> send_resp(code, "")
         end
 
       _ ->
@@ -90,7 +90,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
 
           conn
           |> put_resp_content_type(content_type)
-          |> send_resp(code, ResponseHelper.encode(content_type, resp))
+          |> send_resp(code, Quenya.ResponseHelper.encode(content_type, resp))
         end
     end
   end
