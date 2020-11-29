@@ -41,16 +41,23 @@ defmodule QuenyaBuilder.Router do
     path = uri.path || "/"
     api_router_mod = Module.concat("Elixir", Util.gen_api_router_name(app))
 
-    Util.gen_router_preamble() ++
-      [
-        quote do
-          get("/swagger/main.json", to: SwaggerPlug, init_opts: [app: unquote(app)])
-          get("/swagger", to: SwaggerPlug, init_opts: [spec: "/swagger/main.json"])
+    routes = [
+      quote do
+        get("/swagger/main.json", to: SwaggerPlug, init_opts: [app: unquote(app)])
+        get("/swagger", to: SwaggerPlug, init_opts: [spec: "/swagger/main.json"])
 
-          forward(unquote(path), to: unquote(api_router_mod), init_opts: [])
+        forward(unquote(path), to: unquote(api_router_mod), init_opts: [])
+      end
+    ]
 
-          match(_, to: MathAllPlug, init_opts: [])
-        end
-      ]
+    match_all = case path do
+      "/" -> [quote do
+
+      end]
+      _ -> [quote do
+        match(_, to: MathAllPlug, init_opts: [])
+      end]
+    end
+    Util.gen_router_preamble() ++ routes ++ match_all
   end
 end

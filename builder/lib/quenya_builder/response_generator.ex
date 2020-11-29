@@ -28,7 +28,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
       require Logger
       import Plug.Conn
 
-      alias Quenya.{RequestHelper, ResponseHelper}
+      alias Quenya.ResponseHelper
 
       def init(opts) do
         opts
@@ -68,7 +68,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
 
       _ ->
         quote bind_quoted: [schemas_with_code: Macro.escape(schema), code: code] do
-          accepts = RequestHelper.get_accept(conn)
+          accepts = Quenya.RequestHelper.get_accept(conn)
 
           schema =
             Enum.reduce_while(accepts, nil, fn type, _acc ->

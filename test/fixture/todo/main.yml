@@ -5,10 +5,10 @@ info:
     Hello world! This is a __Sample API__ for todo API
   version: 0.1.0
 servers:
-  - url: https://api.todo.mvc/v1
-    description: Production server
   - url: http://localhost:4000/api/v1
     description: Local dev server
+  - url: https://api.todo.mvc/v1
+    description: Production server
 tags:
   - name: todos
   - name: todo
