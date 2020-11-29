@@ -1,7 +1,7 @@
-defmodule Quenya.Single do
+defmodule QuenyaInstaller.Single do
   @moduledoc false
-  use Quenya.Generator
-  alias Quenya.Project
+  use QuenyaInstaller.Generator
+  alias QuenyaInstaller.Project
 
   template(:new, [
     # config files

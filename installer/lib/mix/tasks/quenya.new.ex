@@ -56,7 +56,7 @@ defmodule Mix.Tasks.Quenya.New do
       mix quenya.new -v
   """
   use Mix.Task
-  alias Quenya.{Generator, Project, Single, Umbrella}
+  alias QuenyaInstaller.{Generator, Project, Single, Umbrella}
 
   @version Mix.Project.config()[:version]
   @shortdoc "Creates a new Quenya v#{@version} application"

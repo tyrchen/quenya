@@ -1,10 +1,10 @@
-defmodule Quenya.Generator do
+defmodule QuenyaInstaller.Generator do
   @moduledoc """
   Quenya user project template generator. Inspired by phoenix installer.
   """
 
   import Mix.Generator
-  alias Quenya.Project
+  alias QuenyaInstaller.Project
 
   @quenya Path.expand("../..", __DIR__)
   @quenya_version Version.parse!(Mix.Project.config()[:version])

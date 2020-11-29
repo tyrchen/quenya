@@ -1,7 +1,7 @@
-defmodule Quenya.Umbrella do
+defmodule QuenyaInstaller.Umbrella do
   @moduledoc false
-  use Quenya.Generator
-  alias Quenya.Project
+  use QuenyaInstaller.Generator
+  alias QuenyaInstaller.Project
 
   template(:new, [
     {:eex, "quenya_umbrella/gitignore", :project, ".gitignore"},

@@ -1,9 +1,9 @@
-defmodule Quenya.Project do
+defmodule QuenyaInstaller.Project do
   @moduledoc """
   Quenya project definition
   """
 
-  alias Quenya.Project
+  alias QuenyaInstaller.Project
 
   defstruct base_path: nil,
             app: nil,
