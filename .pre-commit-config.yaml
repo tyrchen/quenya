@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.4.0
+    hooks:
+      - id: check-byte-order-marker
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+  - repo: https://github.com/psf/black
+    rev: 19.3b0
+    hooks:
+      - id: black
+  - repo: local
+    hooks:
+      - id: mix-fmt
+        name: mix format
+        description: Format files with mix.
+        entry: mix format
+        language: node
+        files: \.exs{0,1}$
+        pass_filenames: false
+      - id: mix-credo
+        name: mix credo
+        description: Check the package for errors.
+        entry: mix credo
+        language: node
+        files: \.exs{0,1}$
+        pass_filenames: false

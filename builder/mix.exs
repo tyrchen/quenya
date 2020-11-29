@@ -8,7 +8,19 @@ defmodule QuenyaBuilder.MixProject do
       version: @version,
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+
+      # Docs
+      name: "QuenyaBuilder",
+      docs: [
+        extras: ["README.md"]
+      ],
+      source_url: "https://github.com/tyrchen/quenya",
+      homepage_url: "https://github.com/tyrchen/quenya",
+      description: """
+      Build API routes based on OpenAPI v3 spec.
+      """,
+      package: package()
     ]
   end
 
@@ -25,10 +37,24 @@ defmodule QuenyaBuilder.MixProject do
       {:plug, "~> 1.11"},
       {:recase, "~> 0.7"},
       {:ex_json_schema, "~> 0.7"},
-      # {:quenya, path: ".."},
-      # {:json_data_faker, path: "../../json_data_faker"}
       {:quenya, git: "git@github.com:tyrchen/quenya"},
-      {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"}
+      {:json_data_faker, "~> 0.1"},
+
+      # dev/test deps
+      {:ex_doc, "~> 0.23", only: :dev, runtime: false},
+      {:credo, "~> 1.5", only: [:dev, :test]}
+    ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README*", "../LICENSE*"],
+      licenses: ["MIT"],
+      maintainers: ["tyr.chen@gmail.com"],
+      links: %{
+        "GitHub" => "https://github.com/tyrchen/quenya",
+        "Docs" => "https://hexdocs.pm/quenya_builder"
+      }
     ]
   end
 end

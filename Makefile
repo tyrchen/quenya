@@ -13,6 +13,13 @@ test:
 	@cd builder; mix test
 	@mix test
 
+credo:
+	@cd installer; mix credo
+	@cd builder; mix credo
+	@mix credo
+
+test-all: credo test
+
 install:
 	@cd installer; rm quenya_installer* && mix archive.install --force
 

@@ -46,7 +46,7 @@ defmodule <%= @app_module %>.MixProject do
       {:quenya_builder, git: "git@github.com:tyrchen/quenya", sparse: "builder", runtime: false},
 
       # Only needed if you'd like to generate fake handler
-      {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"}
+      {:json_data_faker, "~> 0.1"}
     ]
   end
 end

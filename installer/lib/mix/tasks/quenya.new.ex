@@ -259,11 +259,11 @@ defmodule Mix.Tasks.Quenya.New do
   defp check_app_name!(name, from_app_flag) do
     unless name =~ Regex.recompile!(~r/^[a-z][\w_]*$/) do
       extra =
-        if !from_app_flag do
-          ". The application name is inferred from the path, if you'd like to " <>
+        case from_app_flag do
+          false -> ". The application name is inferred from the path, if you'd like to " <>
             "explicitly name the application then use the `--app APP` option."
-        else
-          ""
+
+          _ -> ""
         end
 
       Mix.raise(
