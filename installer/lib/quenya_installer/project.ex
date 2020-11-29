@@ -5,6 +5,19 @@ defmodule QuenyaInstaller.Project do
 
   alias QuenyaInstaller.Project
 
+  @type t :: %__MODULE__{
+    app:   String.t,
+    app_mod: String.t,
+    app_path: String.t,
+    root_app: String.t,
+    root_mod: String.t,
+    project_path: String.t,
+    opts: Keyword.t,
+    in_umbrella?: boolean(),
+    binding: list(),
+    generators: list()
+  }
+
   defstruct base_path: nil,
             app: nil,
             app_mod: nil,
