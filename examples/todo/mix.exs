@@ -6,25 +6,40 @@ defmodule Todo.MixProject do
       app: :todo,
       version: "0.1.0",
       elixir: "~> 1.10",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
+  # Configuration for the OTP application.
+  #
+  # Type `mix help compile.app` for more information.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {Todo.Application, []}
+      mod: {Todo.Application, []},
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "gen", "test/support"]
+  defp elixirc_paths(_), do: ["lib", "gen"]
+
+  # Specifies your project dependencies.
+  #
+  # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:quenya, path: "../..", runtime: false},
+      {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:json_data_faker, path: "../../../json_data_faker"}
+
+      # Quenya utility
+      {:quenya_util, git: "git@github.com:tyrchen/quenya_util"},
+
+      # Only needed if you'd like to generate fake handler
+      {:json_data_faker, git: "git@github.com:tyrchen/json_data_faker"}
     ]
   end
 end

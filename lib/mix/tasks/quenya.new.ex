@@ -99,13 +99,13 @@ defmodule Mix.Tasks.Quenya.New do
   def generate(filename, base_path, generator, path, opts) do
     base_path
     |> Project.new(opts)
-    |> validate_filename(filename)
+    |> Generator.validate_spec_file(filename)
     |> generator.prepare_project()
     |> Generator.put_binding()
     |> validate_project(path)
     |> generator.generate()
-    |> copy_spec_file(filename)
-    |> build_spec()
+    |> Generator.copy_spec_file(filename)
+    |> Generator.build_spec()
     |> prompt_to_install_deps(generator, path)
   end
 
@@ -114,43 +114,6 @@ defmodule Mix.Tasks.Quenya.New do
     check_directory_existence!(Map.fetch!(project, path))
     check_module_name_validity!(project.root_mod)
     check_module_name_availability!(project.root_mod)
-
-    project
-  end
-
-  defp validate_filename(%Project{} = project, filename) do
-    valid? =
-      case File.dir?(filename) do
-        true -> File.exists?(Path.join(filename, "main.yml"))
-        _ -> File.exists?(filename)
-      end
-
-    if not valid? do
-      raise "SPEC shall be an existed yaml file or a folder contains main.yml"
-    end
-
-    project
-  end
-
-  defp copy_spec_file(%Project{} = project, filename) do
-    path = Path.join(project.app_path, "priv/spec")
-    File.mkdir_p!(path)
-
-    case File.dir?(filename) do
-      true -> File.cp_r!(filename, path)
-      _ -> File.copy!(filename, Path.join(path, "main.yml"))
-    end
-
-    project
-  end
-
-  defp build_spec(%Project{} = project) do
-    filename = Path.join(project.app_path, "priv/spec/main.yml")
-    {:ok, spec} = QuenyaUtil.Parser.parse(filename)
-
-    Quenya.Builder.Router.gen(spec, String.to_atom(project.app),
-      path: Path.join(project.app_path, "gen")
-    )
 
     project
   end

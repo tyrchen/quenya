@@ -183,6 +183,44 @@ defmodule Quenya.Generator do
     %Project{project | binding: binding}
   end
 
+  def validate_spec_file(%Project{} = project, filename) do
+    valid? =
+      case File.dir?(filename) do
+        true -> File.exists?(Path.join(filename, "main.yml"))
+        _ -> File.exists?(filename)
+      end
+
+    if not valid? do
+      raise "SPEC shall be an existed yaml file or a folder contains main.yml"
+    end
+
+    project
+  end
+
+  def copy_spec_file(%Project{} = project, filename) do
+    path = Path.join(project.app_path, "priv/spec")
+    File.mkdir_p!(path)
+
+    case File.dir?(filename) do
+      true -> File.cp_r!(filename, path)
+      _ -> File.copy!(filename, Path.join(path, "main.yml"))
+    end
+
+    project
+  end
+
+  def build_spec(%Project{} = project) do
+    filename = Path.join(project.app_path, "priv/spec/main.yml")
+    {:ok, spec} = QuenyaUtil.Parser.parse(filename)
+
+    Quenya.Builder.Router.gen(spec, String.to_atom(project.app),
+      path: Path.join(project.app_path, "gen")
+    )
+
+    project
+  end
+
+  # private functions
   defp elixir_version do
     System.version()
   end
