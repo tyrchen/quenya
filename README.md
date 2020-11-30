@@ -2,7 +2,7 @@
 
 __Disclaimer: Quenya is under active development and is at its early stage. Use with cautions.__
 
-Quenya is a framework to build high-quality REST API applications based on extended OpenAPI spec. With the OAPI spec, Quenya can generate high-quality code for many parts of the API pipeline:
+Quenya is a framework to build high-quality REST API applications based on extended [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md). For the Quenya extension, see [here](docs/quenya_extension.md). With the OAPI spec, Quenya can generate high-quality code for many parts of the API pipeline:
 
 - Preprocessors:
   - [x] request validator: validate the request params
