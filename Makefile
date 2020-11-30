@@ -8,7 +8,7 @@ dep:
 	@cd builder; mix deps.get
 	@mix deps.get
 
-test:
+test: dep
 	@cd installer; mix test
 	@cd builder; mix test
 	@mix test
@@ -18,7 +18,7 @@ credo:
 	@cd builder; mix credo
 	@mix credo
 
-test-all: credo test
+test-all: dep credo test
 
 install:
 	@cd installer; rm quenya_installer* && mix archive.install --force
