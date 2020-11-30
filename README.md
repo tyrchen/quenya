@@ -2,14 +2,14 @@
 
 __Disclaimer: Quenya is under active development and is at its early stage. Use with cautions.__
 
-Quenya is a framework to build high quality REST API applications based on extended OpenAPI spec. With the OAPI spec, Quenya can generate high quality code for many parts of the API pipeline:
+Quenya is a framework to build high-quality REST API applications based on extended OpenAPI spec. With the OAPI spec, Quenya can generate high-quality code for many parts of the API pipeline:
 
 - Preprocessors:
   - [x] request validator: validate the request params
   - [ ] auth handler: process authentication for the API endpoints
   - [ ] access controller: process authorization for the API endpoints
 - API handlers:
-  - [x] fake API handler to generate fake response for mocking purpose
+  - [x] fake API handler to generate a fake response for mocking purpose
   - [ ] gRPC handler to act as a proxy between your client and your gRPC server (require extended OpenAPI grammar)
 - Postprocessors:
   - [x] response validator to validate the response body and headers (for dev/testing purpose)
@@ -18,7 +18,7 @@ Quenya will also provide a set of modules, plugs, test helpers to help you build
 
 ## How to use Quenya?
 
-First of all, install quenya CLI:
+First of all, install Quenya CLI:
 
 ```bash
 $ mix archive.install hex quenya_installer
@@ -84,11 +84,11 @@ Generated petstore app
 Interactive Elixir (1.11.2) - press Ctrl+C to exit (type h() ENTER for help)
 ```
 
-Now you haven't wrote a single line of code. Try open `http://localhost:4000/swagger`. You will see a standard swagger UI:
+Just run a few commands without writing even a single line of code, you have an API app ready to use. Try open `http://localhost:4000/swagger`. You will see an API playground with standard Swagger UI:
 
 ![](docs/images/swagger.jpg)
 
-Nothing special. Now, try to invoke one of the APIs, say `GET /pet/findByStatus`:
+It's great but nothing special. Now, try to invoke one of the APIs, say `GET /pet/findByStatus`:
 
 ![](docs/images/swagger_call.jpg)
 
@@ -119,7 +119,7 @@ server: Cowboy
 {"category":{"id":683,"name":"Dtlir6vgkz6UeAwK5q4._9--A.--._V_mjp.K--3T.0-e_.7-_qfRmfu"},"id":928,"name":"758Yhl_jx_Rt_fi5fz_JtE_k__JY2J__Tt9Y1","photoUrls":["https://source.unsplash.com/random/400x400","https://source.unsplash.com/random/400x400"],"status":"sold","tags":[{"id":480,"name":"iusto"},{"id":64,"name":"error"},{"id":658,"name":"modi"},{"id":313,"name":"nihil"}]}
 ```
 
-Now you have a basic feeling on what's going on. By default, quenya will generate API router based on API spec, with a convenient swagger UI. For each route defined in spec, quenya will generate a Plug for it. And a Plug is a pipeline which will execute in this order:
+Now you have a basic feeling on what's going on. By default, Quenya will generate an API router based on API spec, with a convenient swagger UI. For each route defined in spec, Quenya will generate a Plug for it. And a Plug is a pipeline which will execute in this order:
 
 - preprocessors: any Plug to be executed before the actual route handler. Here, RequestValidator Plug will help to validate request params against the schema.
 - handlers: handlers for the route. This is what you shall put your actual API logic, but for mocking purpose, Quenya generates a fake handler which meets the response schema. In future, Quenya will support gRPC handler which will be very useful if what you need is a grpc proxy (think [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)).
@@ -127,29 +127,113 @@ Now you have a basic feeling on what's going on. By default, quenya will generat
 
 Quenya consists of 3 parts:
 
-1. quenya_installer: help with quenya project generation (the CLI you just used).
-2. quenya_builder: a code generator to generate API implementation based on extended OpenAPI v3 spec. Every time you run `mix compile`, quenya will rebuild the spec to code (need improvement here).
+1. quenya_installer: help with Quenya project generation (the CLI you just used).
+2. quenya_builder: a code generator to generate API implementation based on extended OpenAPI v3 spec. Every time you run `mix compile`, Quenya will rebuild the spec to code (need improvement here).
 3. quenya: a library consist of utility functions, tests and a playground to play with API or API stub.
+
+## What's the generated code?
+
+If you look at the `gen` folder in the newly generated app, you'll find all your routes and routers are organized by `operationId`:
+
+```bash
+$ tree -L 1
+.
+├── Petstore.Gen.ApiRouter.ex
+├── Petstore.Gen.Router.ex
+├── addPet
+├── createUser
+├── createUsersWithArrayInput
+├── createUsersWithListInput
+├── deleteOrder
+├── deletePet
+├── deleteUser
+├── findPetsByStatus
+├── findPetsByTags
+├── getInventory
+├── getOrderById
+├── getPetById
+├── getUserByName
+├── loginUser
+├── logoutUser
+├── placeOrder
+├── updatePet
+├── updatePetWithForm
+├── updateUser
+└── uploadFile
+
+20 directories, 2 files
+```
+
+The main router will serve swagger and forward the path (extracted from the spec) to the API router:
+
+```elixir
+defmodule Petstore.Gen.Router do
+  @moduledoc false
+  use Plug.Router
+  use Plug.ErrorHandler
+  require Logger
+  alias Quenya.Plug.SwaggerPlug
+  plug Plug.Logger, log: :info
+  plug Plug.Static, at: "/public", from: {:quenya, "priv/swagger"}
+
+  plug :match
+  plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+  plug :dispatch
+
+  def handle_errors(conn, %{kind: _kind, reason: %{message: msg}, stack: _stack}) do
+    Plug.Conn.send_resp(conn, conn.status, msg)
+  end
+
+  def handle_errors(conn, %{kind: kind, reason: reason, stack: stack}) do
+    Logger.warn(
+      "Internal error:\n kind: #{inspect(kind)}\n reason: #{inspect(reason)}\n stack: #{
+        inspect(stack)
+      }"
+    )
+
+    Plug.Conn.send_resp(conn, conn.status, "Internal server error")
+  end
+
+  get("/swagger/main.json", to: SwaggerPlug, init_opts: [app: :petstore])
+  get("/swagger", to: SwaggerPlug, init_opts: [spec: "/swagger/main.json"])
+  forward "/", to: Petstore.Gen.ApiRouter, init_opts: []
+end
+```
+
+The API router contains code for all routes, for example:
+
+```elixir
+put("/user/:username",
+    to: RoutePlug,
+    init_opts: [
+      preprocessors: [Petstore.Gen.UpdateUser.RequestValidator],
+      postprocessors: [],
+      handlers: [Petstore.Gen.UpdateUser.FakeHandler]
+    ]
+  )
+```
+
+When a `PUT /user/:username` request kicks in, it will be handled by `Quenya.Plug.RoutePlug`, and it will run `preprocessors`, `handlers` and `postprocessors` in the right order.
 
 ## Why Quenya?
 
-Building a high quality HTTP API app is non trivial. Good APIs have tehse traits:
+Building a high-quality HTTP API app is non-trivial. Good APIs have these traits:
 
 For API users:
 
-- Easy to learn and intuitive to use (app provides full-fledged and good quality docs / playground)
-- Hard to misuse (API is type-safty and provides proper error responses)
+- Easy to learn and intuitive to use (the app provides full-fledged and good quality docs / playground)
+- Hard to misuse (API is type-safety and provides proper error responses)
 - Powerful enough to drive business requirements (flexible, performant)
 - Easy to evolve as the products grow
 - Opinionated (don't make me think)
 
 For developers:
 
-- Easy to read an maintain existing code
+- Easy to read and maintain existing code
 - Easy to write new APIs / extend existing APIs
 - Easy to generate code based on API spec (client SDKs, test cases, and even server implementation)
 
-API implementation is just a small part of API lifecycle, we need API design, mocking, testing, simulating, documentation, deployment, etc.
+API implementation is just a small part of the API lifecycle, we need API design, mocking, testing, simulating, documentation, deployment, etc.
 
 ![](docs/images/api.png)
 
@@ -160,7 +244,7 @@ Quenya tries to help you start with the API spec, iterate it without writing the
 I've used GraphQL in many projects, I even built a tool called [goldorin](https://hex.pm/packages/goldorin) to generate Absinthe/Ecto code from a homebrewed spec language called `goldorin`. GraphQL has its advantages like:
 
 - Easy to use (GraphQL playground is even greater than swagger!)
-- Flexible query makes client easy to get the right amount of data it needs
+- Flexible query makes clients easy to get the right amount of data it needs
 - Save client API requests round trips Subscription is great for building event driven apps
 - A good aggregate layer to micro services Apollo toolchain is pretty decent
 - Good ecosystem (e.g. AWS AppSync support it)
@@ -169,9 +253,9 @@ But it also has many drawbacks, which is more serious than its advantages:
 
 - A big learning curve for both client and server devs
 - Breaks general HTTP ecosystem
-    - Every request is a POST (breaks caching)
-    - Every response is 200 (breaks the HTTP semantics)
-    - All APIs inside a schema point to same API location (breaks URI based routing, and monitoring ecosystem)
+      - Every request is a POST (breaks caching)
+      - Every response is 200 (breaks the HTTP semantics)
+      - All APIs inside a schema point to the same API location (breaks URI based routing, and monitoring ecosystem)
 - Complexity of a query sometimes pretty tricky
 - N + 1 problem (dataloader fixed part of the issue)
 - Need extra work for logging, monitoring, caching, etc. (a big headache)
