@@ -5,12 +5,12 @@ defmodule QuenyaBuilder.ResponseGenerator do
   require DynamicModule
   alias QuenyaBuilder.Util
 
-  def gen(doc, app, name, opts \\ []) do
+  def gen(res, app, name, opts \\ []) do
     mod_name = Util.gen_fake_handler_name(app, name)
 
     preamble = gen_preamble()
-    header = gen_header(doc["responses"])
-    body = gen_body(doc["responses"])
+    header = gen_header(res)
+    body = gen_body(res)
 
     contents =
       quote do
@@ -34,8 +34,8 @@ defmodule QuenyaBuilder.ResponseGenerator do
     end
   end
 
-  defp gen_header(resp) do
-    schemas = Util.get_response_schemas(resp, "headers")
+  defp gen_header(data) do
+    schemas = Util.get_response_schemas(data, "headers")
     {_code, schemas_with_code} = Util.choose_best_code_schema(schemas)
 
     case Enum.empty?(schemas) do
@@ -54,8 +54,8 @@ defmodule QuenyaBuilder.ResponseGenerator do
     end
   end
 
-  defp gen_body(resp) do
-    schemas = Util.get_response_schemas(resp, "content")
+  defp gen_body(data) do
+    schemas = Util.get_response_schemas(data, "content")
 
     {code, schema} = Util.choose_best_code_schema(schemas)
 

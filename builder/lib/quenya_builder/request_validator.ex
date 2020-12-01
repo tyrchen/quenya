@@ -14,15 +14,14 @@ defmodule QuenyaBuilder.RequestValidator do
   require DynamicModule
 
   alias QuenyaBuilder.Util
-  alias ExJsonSchema.Schema
 
-  def gen(doc, app, name, opts \\ []) do
+  def gen(req, params, app, name, opts \\ []) do
     mod_name = Util.gen_request_validator_name(app, name)
 
     preamble = gen_preamble()
 
-    param_validator = gen_parameter_validator(doc["parameters"])
-    body_validator = gen_body_validator(doc["requestBody"])
+    param_validator = gen_parameter_validator(params)
+    body_validator = gen_body_validator(req)
 
     contents =
       quote do
@@ -48,7 +47,7 @@ defmodule QuenyaBuilder.RequestValidator do
     end
   end
 
-  defp gen_parameter_validator(nil) do
+  defp gen_parameter_validator([]) do
     quote do
     end
   end
@@ -57,12 +56,7 @@ defmodule QuenyaBuilder.RequestValidator do
     data =
       params
       |> Enum.map(fn p ->
-        name = p["name"]
-
-        position = Util.ensure_position(p["in"])
-        required = p["required"] || false
-        schema = p["schema"] |> Schema.resolve()
-        {name, position, required, schema}
+        {p.name, p.position, p.required, p.schema}
       end)
       |> Macro.escape()
 
@@ -91,9 +85,8 @@ defmodule QuenyaBuilder.RequestValidator do
 
   defp gen_body_validator(body) do
     schemas =
-      Enum.reduce(body["content"], %{}, fn {k, v}, acc ->
-        result = Schema.resolve(v["schema"])
-        Map.put(acc, k, result)
+      Enum.reduce(body.content, %{}, fn {k, v}, acc ->
+        Map.put(acc, k, v.schema)
       end)
       |> Macro.escape()
 

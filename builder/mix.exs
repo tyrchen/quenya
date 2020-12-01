@@ -39,6 +39,7 @@ defmodule QuenyaBuilder.MixProject do
       {:ex_json_schema, "~> 0.7"},
       {:quenya, "~> 0.2"},
       {:json_data_faker, "~> 0.1"},
+      {:typed_struct, "~> 0.2.1"},
 
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},

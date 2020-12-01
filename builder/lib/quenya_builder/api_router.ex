@@ -4,6 +4,7 @@ defmodule QuenyaBuilder.ApiRouter do
   """
   require DynamicModule
   alias QuenyaBuilder.{RequestValidator, ResponseValidator, ResponseGenerator, Util}
+  alias QuenyaBuilder.Object
 
   def gen(doc, app, opts \\ []) do
     mod_name = Util.gen_api_router_name(app)
@@ -44,15 +45,19 @@ defmodule QuenyaBuilder.ApiRouter do
         doc["operationId"] ||
           raise "Must define operationId for #{uri} with method #{method}. It will be used to generate module name"
 
-      new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
-      RequestValidator.gen(doc, app, name, new_opts)
+      req = Object.gen_req_object(name, doc["requestBody"])
+      params = Object.gen_param_objects(name, doc["parameters"])
+      res = Object.gen_res_objects(name, doc["responses"])
 
-      if Application.get_env(:quenya, :use_response_validator) do
-        ResponseValidator.gen(doc, app, name, new_opts)
+      new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
+      RequestValidator.gen(req, params, app, name, new_opts)
+
+      if Application.get_env(:quenya, :use_response_validator, true) do
+        ResponseValidator.gen(res, app, name, new_opts)
       end
 
-      if Application.get_env(:quenya, :use_fake_handler) do
-        ResponseGenerator.gen(doc, app, name, new_opts)
+      if Application.get_env(:quenya, :use_fake_handler, true) do
+        ResponseGenerator.gen(res, app, name, new_opts)
       end
 
       method = Util.normalize_name(method)

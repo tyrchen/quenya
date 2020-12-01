@@ -15,13 +15,13 @@ defmodule QuenyaBuilder.ResponseValidator do
 
   alias QuenyaBuilder.Util
 
-  def gen(doc, app, name, opts \\ []) do
+  def gen(res, app, name, opts \\ []) do
     mod_name = Util.gen_response_validator_name(app, name)
 
     preamble = gen_preamble()
 
-    header_validator = gen_header_validators(doc["responses"])
-    body_validator = gen_body_validators(doc["responses"])
+    header_validator = gen_header_validators(res)
+    body_validator = gen_body_validators(res)
 
     contents =
       quote do
@@ -49,13 +49,8 @@ defmodule QuenyaBuilder.ResponseValidator do
     end
   end
 
-  defp gen_header_validators(nil) do
-    quote do
-    end
-  end
-
-  defp gen_header_validators(resp) do
-    schemas = Util.get_response_schemas(resp, "headers")
+  defp gen_header_validators(data) do
+    schemas = Util.get_response_schemas(data, "headers")
 
     case Enum.empty?(schemas) do
       true ->
@@ -80,14 +75,9 @@ defmodule QuenyaBuilder.ResponseValidator do
     end
   end
 
-  defp gen_body_validators(nil) do
-    quote do
-    end
-  end
-
-  defp gen_body_validators(resp) do
+  defp gen_body_validators(data) do
     schemas =
-      Util.get_response_schemas(resp, "content")
+      Util.get_response_schemas(data, "content")
       |> Macro.escape()
 
     quote bind_quoted: [schemas: schemas] do
