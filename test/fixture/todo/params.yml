@@ -1,0 +1,34 @@
+cursor:
+  name: X-Cursor
+  in: header
+  required: true
+  description: cursor for next page
+  schema:
+    type: string
+filter:
+  name: filter
+  in: query
+  description: >
+    filter type:
+      * `all`: default, show all items
+      * `active`: show active todo items
+      * `completed`: show completed todo items
+  schema:
+    type: string
+    enum: [all, active, completed]
+    default: all
+limit:
+  name: limit
+  in: query
+  required: false
+  description: >
+    how many items to return at one time
+    * default: 10
+    * min: 10
+    * max: 100
+  schema:
+    type: integer
+    format: int32
+    minimum: 10
+    maximum: 100
+    default: 10

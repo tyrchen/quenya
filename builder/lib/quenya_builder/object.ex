@@ -55,10 +55,10 @@ defmodule QuenyaBuilder.Object do
     field :examples, list(map())
   end
 
-  def gen_req_object(_operationId, nil), do: %Request{}
+  def gen_req_object(_id, nil), do: %Request{}
 
-  def gen_req_object(operationId, data) do
-    content = gen_content(operationId, "request body", data["content"])
+  def gen_req_object(id, data) do
+    content = gen_content(id, "request body", data["content"])
 
     %Request{
       description: data["description"],
@@ -67,7 +67,7 @@ defmodule QuenyaBuilder.Object do
     }
   end
 
-  def gen_param_objects(operationId, data) do
+  def gen_param_objects(id, data) do
     Enum.map(data || [], fn p ->
       name =
         p["name"] || raise "Shall define name in the request parameters. data: #{inspect(data)}"
@@ -77,7 +77,7 @@ defmodule QuenyaBuilder.Object do
         name: name,
         position: ensure_position(p["in"]),
         required: p["required"] || false,
-        schema: get_schema(operationId, "request parameters", name, p),
+        schema: get_schema(id, "request parameters", name, p),
         deprecated: p["deprecated"] || false,
         style: p["style"] || :simple,
         explode: p["explode"] || false,
@@ -86,10 +86,10 @@ defmodule QuenyaBuilder.Object do
     end)
   end
 
-  def gen_res_objects(operationId, data) do
+  def gen_res_objects(id, data) do
     Enum.reduce(data || %{}, %{}, fn {code, item}, res ->
-      headers = gen_res_header_object(operationId, item["headers"])
-      content = gen_content(operationId, "response body", item["content"])
+      headers = gen_res_header_object(id, item["headers"])
+      content = gen_content(id, "response body", item["content"])
 
       response = %Response{
         description: item["description"] || "",
@@ -102,25 +102,25 @@ defmodule QuenyaBuilder.Object do
   end
 
   # private functions
-  defp gen_content(operationId, position, data) do
+  defp gen_content(id, position, data) do
     Enum.reduce(data || %{}, %{}, fn {k, v}, acc ->
-      Map.put(acc, k, gen_media_type_object(operationId, position, k, v))
+      Map.put(acc, k, gen_media_type_object(id, position, k, v))
     end)
   end
 
-  defp gen_media_type_object(operationId, position, type, data) do
+  defp gen_media_type_object(id, position, type, data) do
     %MediaType{
-      schema: get_schema(operationId, position, type, data),
+      schema: get_schema(id, position, type, data),
       examples: get_examples(data)
     }
   end
 
-  defp gen_res_header_object(operationId, data) do
+  defp gen_res_header_object(id, data) do
     Enum.reduce(data || %{}, %{}, fn {k, v}, acc ->
       result = %Header{
         description: v["description"] || "",
         required: v["required"] || false,
-        schema: get_schema(operationId, "response headers", k, v),
+        schema: get_schema(id, "response headers", k, v),
         deprecated: v["deprecated"] || false,
         style: v["style"] || :simple,
         explode: v["explode"] || false,
@@ -145,10 +145,10 @@ defmodule QuenyaBuilder.Object do
     end
   end
 
-  defp get_schema(operationId, position, name, data) do
+  defp get_schema(id, position, name, data) do
     schema =
       data["schema"] ||
-        raise "#{operationId}: shall define schema in the #{inspect(position)} for #{
+        raise "#{id}: shall define schema in the #{inspect(position)} for #{
                 inspect(name)
               }. data: #{inspect(data)}"
 
