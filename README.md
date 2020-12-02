@@ -20,6 +20,8 @@ Quenya will also provide a set of modules, plugs, test helpers to help you build
 
 ## How to use Quenya?
 
+### Install CLI
+
 First of all, install Quenya CLI:
 
 ```bash
@@ -27,7 +29,7 @@ $ mix archive.install hex quenya_installer
 Resolving Hex dependencies...
 Dependency resolution completed:
 New:
-  quenya_installer 0.2.1
+  quenya_installer 0.3.0
 * Getting quenya_installer (Hex package)
 
 20:22:15.605 [info]  erl_tar: removed leading '/' from member names
@@ -35,10 +37,12 @@ New:
 All dependencies are up to date
 Compiling 5 files (.ex)
 Generated quenya_installer app
-Generated archive "quenya_installer-0.2.1.ez" with MIX_ENV=prod
-Are you sure you want to install "quenya_installer-0.2.1.ez"? [Yn]
-* creating /Users/tchen/.mix/archives/quenya_installer-0.2.1
+Generated archive "quenya_installer-0.3.0.ez" with MIX_ENV=prod
+Are you sure you want to install "quenya_installer-0.3.0.ez"? [Yn]
+* creating /Users/tchen/.mix/archives/quenya_installer-0.3.0
 ```
+
+### Generate APP from an existing OAPI spec
 
 Once you finished installing quenya CLI, you can build a API app with quenya:
 
@@ -74,10 +78,15 @@ You can run your app inside IEx (Interactive Elixir) as:
 
 ```
 
-This will create a new elixir app, copy your spec file (or spec folder) to `priv/spec/main.yml`, and generate API code based on the spec. Now you can run the app:
+This will create a new elixir app, copy your spec file (or spec folder) to `priv/spec/main.yml`, and generate API code based on the spec.
+
+### Running the app
+
+Now you can run the app:
 
 ```bash
 $ cd petstore/
+$ mix compile.quenya # this command will generate/regenerate code on /gen and /test/gen folders
 $ iex -S mix
 Erlang/OTP 23 [erts-11.1.3] [source] [64-bit] [smp:16:16] [ds:16:16:10] [async-threads:1] [hipe] [dtrace]
 
@@ -121,7 +130,54 @@ server: Cowboy
 {"category":{"id":683,"name":"Dtlir6vgkz6UeAwK5q4._9--A.--._V_mjp.K--3T.0-e_.7-_qfRmfu"},"id":928,"name":"758Yhl_jx_Rt_fi5fz_JtE_k__JY2J__Tt9Y1","photoUrls":["https://source.unsplash.com/random/400x400","https://source.unsplash.com/random/400x400"],"status":"sold","tags":[{"id":480,"name":"iusto"},{"id":64,"name":"error"},{"id":658,"name":"modi"},{"id":313,"name":"nihil"}]}
 ```
 
-Now you have a basic feeling on what's going on. By default, Quenya will generate an API router based on API spec, with a convenient swagger UI. For each route defined in spec, Quenya will generate a Plug for it. And a Plug is a pipeline which will execute in this order:
+### Running the tests
+
+Quenya generates property tests for all your API endpoints based on OAPI spec, so before coding your own API handler into the repo, you'd like to be more test-driven, try `mix test` now:
+
+```bash
+$ mix test
+Compiling 42 files (.ex)
+Generated petstore app
+............FF......
+
+Finished in 2.7 seconds
+20 properties, 2 failures
+```
+
+Don't worry too much about two failed cases, Quenya is still early so certain content negotiation type is not supported yet. We will support that soon!
+
+Note these tests covers all success cases. In future, we will try to cover all failed cases in Quenya.
+
+### How much code Quenya generated for you?
+
+If you have `tokei` installed, you can have a basic idea on how much code Quenya generated for you:
+
+```bash
+$ tokei gen test
+-------------------------------------------------------------------------------
+ Language            Files        Lines         Code     Comments       Blanks
+-------------------------------------------------------------------------------
+ Elixir                 63         5138         4573            0          565
+-------------------------------------------------------------------------------
+ Total                  63         5138         4573            0          565
+-------------------------------------------------------------------------------
+```
+
+That's 4.5k LoC for the petstore spec. The more APIs you defined, the more Quenya will do for you. Once we have most of the parts of Quenya built, this number will be much bigger.
+
+Now try edit config:
+
+```elixir
+config :quenya,
+  use_fake_handler: true,
+  use_response_validator: true, # change this to true
+  apis: %{}
+```
+
+Rerun tokei, you'll get 6k LoC.
+### What's under the hood?
+
+Now you have a basic feeling on what's going on. By default, Quenya will generate an API router based on API spec, with a convenient swagger UI. For each route defined in the spec, Quenya will generate a Plug for it. And a Plug is a pipeline which will execute in this order:
 
 - preprocessors: any Plug to be executed before the actual route handler. Here, RequestValidator Plug will help to validate request params against the schema.
 - handlers: handlers for the route. This is what you shall put your actual API logic, but for mocking purpose, Quenya generates a fake handler which meets the response schema. In future, Quenya will support gRPC handler which will be very useful if what you need is a grpc proxy (think [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)).
