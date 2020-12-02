@@ -36,14 +36,13 @@ defmodule Quenya.RequestHelper do
   def get_param(conn, name, "cookie", schema), do: normalize_param(conn.cookies[name], schema)
 
   def get_content_type(conn) do
-    v = get_param(conn, "content-type", "header", nil)
+    v = get_param(conn, "content-type", "header", nil) || ""
     [result | _] = String.split(v, ";")
     result
   end
 
   def get_accept(conn) do
-    conn
-    |> get_param("accept", "header", nil)
+    (get_param(conn, "accept", "header", nil) || "*/*")
     |> String.split(",")
     |> Enum.map(fn part ->
       [result | _] = part |> String.trim() |> String.split(";")

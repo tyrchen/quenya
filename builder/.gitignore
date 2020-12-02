@@ -25,3 +25,9 @@ quenya_builder-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+/gen
+
+/lib/gen
+
+/test/gen

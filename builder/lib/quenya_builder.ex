@@ -11,11 +11,14 @@ defmodule QuenyaBuilder do
   """
   def run(filename, app) do
     path = Path.join(File.cwd!(), "gen")
+
     case Parser.parse(filename) do
       {:ok, spec} ->
         Router.gen(spec, app, path: path, create: false, output: false)
         :ok
-      error -> error
+
+      error ->
+        error
     end
   end
 end

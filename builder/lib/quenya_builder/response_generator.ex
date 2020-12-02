@@ -4,13 +4,14 @@ defmodule QuenyaBuilder.ResponseGenerator do
   """
   require DynamicModule
   alias QuenyaBuilder.Util
+  alias Quenya.ResponseHelper
 
-  def gen(doc, app, name, opts \\ []) do
+  def gen(res, app, name, opts \\ []) do
     mod_name = Util.gen_fake_handler_name(app, name)
 
     preamble = gen_preamble()
-    header = gen_header(doc["responses"])
-    body = gen_body(doc["responses"])
+    header = gen_header(res)
+    body = gen_body(res)
 
     contents =
       quote do
@@ -34,11 +35,11 @@ defmodule QuenyaBuilder.ResponseGenerator do
     end
   end
 
-  defp gen_header(resp) do
-    schemas = Util.get_response_schemas(resp, "headers")
-    {_code, schemas_with_code} = Util.choose_best_code_schema(schemas)
+  defp gen_header(data) do
+    schemas = Util.get_response_schemas(data, "headers")
+    {_code, schemas_with_code} = ResponseHelper.choose_best_response(schemas)
 
-    case Enum.empty?(schemas) do
+    case Enum.empty?(schemas_with_code) do
       true ->
         quote do
         end
@@ -47,20 +48,26 @@ defmodule QuenyaBuilder.ResponseGenerator do
         quote bind_quoted: [schemas_with_code: Macro.escape(schemas_with_code)] do
           conn =
             Enum.reduce(schemas_with_code, conn, fn {name, schema}, acc ->
-              v = JsonDataFaker.generate(schema[:schema])
-              put_resp_header(acc, name, v)
+              v =
+                case Quenya.TestHelper.get_one(JsonDataFaker.generate(schema[:schema])) do
+                  v when is_binary(v) -> v
+                  v when is_integer(v) -> Integer.to_string(v)
+                  v -> "#{inspect(v)}"
+                end
+
+              Plug.Conn.put_resp_header(acc, name, v)
             end)
         end
     end
   end
 
-  defp gen_body(resp) do
-    schemas = Util.get_response_schemas(resp, "content")
+  defp gen_body(data) do
+    schemas = Util.get_response_schemas(data, "content")
 
-    {code, schema} = Util.choose_best_code_schema(schemas)
+    {code, schema} = ResponseHelper.choose_best_response(schemas)
 
-    case schema do
-      nil ->
+    case Enum.empty?(schema) do
+      true ->
         quote do
           conn
           |> send_resp(unquote(code), "")
@@ -86,7 +93,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
               )
 
           content_type = Keyword.get(schema, :content_type, "application/json")
-          resp = JsonDataFaker.generate(schema[:schema]) || ""
+          resp = Quenya.TestHelper.get_one(JsonDataFaker.generate(schema[:schema])) || ""
 
           conn
           |> put_resp_content_type(content_type)
