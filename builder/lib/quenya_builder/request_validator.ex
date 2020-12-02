@@ -88,25 +88,36 @@ defmodule QuenyaBuilder.RequestValidator do
       Enum.reduce(body.content, %{}, fn {k, v}, acc ->
         Map.put(acc, k, v.schema)
       end)
-      |> Macro.escape()
 
-    quote bind_quoted: [schemas: schemas] do
-      content_type = Quenya.RequestHelper.get_content_type(conn)
-      data = conn.body_params
+    case Enum.empty?(schemas) do
+      true ->
+        quote do
+        end
 
-      schema =
-        schemas[content_type] ||
-          raise(
-            Plug.BadRequestError,
-            "Unsupported request content type #{content_type}. Supported content type: #{
-              inspect(Map.keys(schemas))
-            }"
-          )
+      _ ->
+        quote bind_quoted: [schemas: schemas |> Macro.escape()] do
+          content_type = Quenya.RequestHelper.get_content_type(conn)
 
-      case ExJsonSchema.Validator.validate(schema, data) do
-        {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
-        :ok -> :ok
-      end
+          data =
+            case Map.get(conn.body_params, "_json") do
+              nil -> conn.body_params
+              v -> v
+            end
+
+          schema =
+            schemas[content_type] ||
+              raise(
+                Plug.BadRequestError,
+                "Unsupported request content type #{content_type}. Supported content type: #{
+                  inspect(Map.keys(schemas))
+                }"
+              )
+
+          case ExJsonSchema.Validator.validate(schema, data) do
+            {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
+            :ok -> :ok
+          end
+        end
     end
   end
 end

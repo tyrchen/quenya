@@ -55,7 +55,7 @@ defmodule QuenyaBuilder.Object do
     field :examples, list(map())
   end
 
-  def gen_req_object(_operationId, nil), do: nil
+  def gen_req_object(_operationId, nil), do: %Request{}
 
   def gen_req_object(operationId, data) do
     content = gen_content(operationId, "request body", data["content"])
@@ -127,7 +127,7 @@ defmodule QuenyaBuilder.Object do
         examples: get_examples(v)
       }
 
-      Map.put(acc, k, result)
+      Map.put(acc, String.downcase(k), result)
     end)
   end
 

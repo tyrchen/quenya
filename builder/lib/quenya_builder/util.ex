@@ -31,6 +31,10 @@ defmodule QuenyaBuilder.Util do
     gen_module_name(app, "Gen", name, "FakeHandler")
   end
 
+  def gen_test_name(app, name) do
+    gen_module_name(:"#{app}_test", "Gen", name)
+  end
+
   def gen_router_name(app) do
     gen_module_name(app, "Gen", "Router")
   end
@@ -61,37 +65,8 @@ defmodule QuenyaBuilder.Util do
           Map.put(acc2, k, schema: v.schema, required: Map.get(v, :required) || false)
         end)
 
-      case Enum.empty?(result1) do
-        true -> acc1
-        _ -> Map.put(acc1, code, result1)
-      end
+      Map.put(acc1, code, result1)
     end)
-  end
-
-  def choose_best_code_schema(schemas) do
-    case schemas["200"] do
-      nil ->
-        status =
-          schemas
-          |> Map.keys()
-          |> Enum.reduce_while(nil, fn item, _acc ->
-            case item do
-              "2" <> _ -> {:halt, item}
-              _ -> {:cont, item}
-            end
-          end) || "200"
-
-        code =
-          case status do
-            "default" -> 200
-            _ -> String.to_integer(status)
-          end
-
-        {code, schemas[status]}
-
-      v ->
-        {200, v}
-    end
   end
 
   def gen_router_preamble do
@@ -142,8 +117,4 @@ defmodule QuenyaBuilder.Util do
     end)
     |> Enum.join("/")
   end
-
-  def normalize_name(nil), do: nil
-  def normalize_name(name) when is_atom(name), do: name
-  def normalize_name(name), do: String.to_atom(name)
 end

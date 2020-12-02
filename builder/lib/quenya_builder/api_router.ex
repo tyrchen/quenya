@@ -3,7 +3,15 @@ defmodule QuenyaBuilder.ApiRouter do
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
-  alias QuenyaBuilder.{RequestValidator, ResponseValidator, ResponseGenerator, Util}
+
+  alias QuenyaBuilder.{
+    RequestValidator,
+    ResponseValidator,
+    ResponseGenerator,
+    UnitTestGenerator,
+    Util
+  }
+
   alias QuenyaBuilder.Object
 
   def gen(doc, app, opts \\ []) do
@@ -39,11 +47,11 @@ defmodule QuenyaBuilder.ApiRouter do
 
   defp gen_uri(uri, ops, app, opts) do
     Enum.map(ops, fn {method, doc} ->
-      uri = Util.normalize_uri(uri)
-
       name =
         doc["operationId"] ||
           raise "Must define operationId for #{uri} with method #{method}. It will be used to generate module name"
+
+      method = DynamicModule.normalize_name(method)
 
       req = Object.gen_req_object(name, doc["requestBody"])
       params = Object.gen_param_objects(name, doc["parameters"])
@@ -60,15 +68,20 @@ defmodule QuenyaBuilder.ApiRouter do
         ResponseGenerator.gen(res, app, name, new_opts)
       end
 
-      method = Util.normalize_name(method)
+      ut_opts =
+        new_opts
+        # |> Keyword.put(:type, :test)
+        |> Keyword.update!(:path, fn _ -> "test/gen" end)
+
+      UnitTestGenerator.gen(method, uri, req, params, res, app, name, ut_opts)
+
       init_opts = gen_route_plug_opts(app, name)
 
-      result =
-        quote do
-          unquote(method)(unquote(uri), to: RoutePlug, init_opts: unquote(init_opts))
-        end
+      uri = Util.normalize_uri(uri)
 
-      result
+      quote do
+        unquote(method)(unquote(uri), to: RoutePlug, init_opts: unquote(init_opts))
+      end
     end)
   end
 

@@ -32,14 +32,17 @@ defmodule QuenyaBuilder.MixProject do
 
   defp deps do
     [
-      {:dynamic_module, "~> 0.1"},
+      {:dynamic_module_new, "~> 0.1"},
       {:jason, "~> 1.2"},
       {:plug, "~> 1.11"},
       {:recase, "~> 0.7"},
       {:ex_json_schema, "~> 0.7"},
-      {:quenya, "~> 0.2"},
-      {:json_data_faker, "~> 0.1"},
+      # {:quenya, "~> 0.2"},
+      # {:json_data_faker, "~> 0.1"},
+      {:quenya, path: ".."},
+      {:json_data_faker, path: "../../json_data_faker"},
       {:typed_struct, "~> 0.2.1"},
+      {:stream_data, "~> 0.5"},
 
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},

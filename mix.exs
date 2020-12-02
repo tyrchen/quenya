@@ -1,7 +1,7 @@
 defmodule Quenya.MixProject do
   use Mix.Project
 
-  @version "0.2.1"
+  @version "0.3.0"
   def project do
     [
       app: :quenya,
@@ -43,6 +43,8 @@ defmodule Quenya.MixProject do
       {:jason, "~> 1.2"},
       {:uuid, "~> 1.0"},
       {:deep_merge, "~> 1.0"},
+      {:stream_data, "~> 0.5"},
+      {:json_data_faker, "~> 0.2"},
 
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
