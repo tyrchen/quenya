@@ -11,7 +11,7 @@ defmodule <%= @app_module %>.MixProject do
       lockfile: "../../mix.lock",<% end %>
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:quenya] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -40,10 +40,10 @@ defmodule <%= @app_module %>.MixProject do
       {:plug_cowboy, "~> 2.0"},
 
       # Quenya
-      {:quenya, "~> 0.2"},
+      {:quenya, "~> 0.3"},
 
       # Quenya builder
-      {:quenya_builder, "~> 0.2", runtime: false},
+      {:quenya_builder, "~> 0.3", runtime: false},
 
       # Only needed if you'd like to generate fake handler
       {:json_data_faker, "~> 0.1"}

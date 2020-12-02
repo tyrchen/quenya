@@ -70,7 +70,7 @@ defmodule QuenyaBuilder.ApiRouter do
 
       ut_opts =
         new_opts
-        # |> Keyword.put(:type, :test)
+        |> Keyword.put(:type, :test)
         |> Keyword.update!(:path, fn _ -> "test/gen" end)
 
       UnitTestGenerator.gen(method, uri, req, params, res, app, name, ut_opts)
