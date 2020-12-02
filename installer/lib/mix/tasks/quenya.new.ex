@@ -152,6 +152,7 @@ defmodule Mix.Tasks.Quenya.New do
       end)
 
     cd_step = ["$ cd #{relative_app_path(path)}"]
+    quenya_step = ["$ mix compile.quenya"]
 
     maybe_cd(path, fn ->
       mix_step = install_mix(project, install?)
@@ -164,7 +165,7 @@ defmodule Mix.Tasks.Quenya.New do
 
       Task.await(compile, :infinity)
 
-      print_missing_steps(cd_step ++ mix_step)
+      print_missing_steps(cd_step ++ mix_step ++ quenya_step)
 
       print_mix_info(generator)
     end)
@@ -211,6 +212,10 @@ defmodule Mix.Tasks.Quenya.New do
     You can run your app inside IEx (Interactive Elixir) as:
 
         $ iex -S mix
+
+    If in future you modified config for quenya building options, or changed spec, run:
+
+        $ mix compile.quenya
     """)
   end
 
