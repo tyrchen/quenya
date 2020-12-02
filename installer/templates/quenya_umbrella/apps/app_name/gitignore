@@ -24,3 +24,5 @@ erl_crash.dump
 
 # Quenya generated code
 /gen
+/lib/gen
+/test/gen

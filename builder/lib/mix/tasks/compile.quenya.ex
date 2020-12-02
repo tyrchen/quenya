@@ -18,6 +18,9 @@ defmodule Mix.Tasks.Compile.Quenya do
 
   defp build_spec do
     cwd = File.cwd!()
+
+    # remove existing files
+    Enum.each(["gen", "lib/gen", "test/gen"], &File.rm_rf!/1)
     filename = Path.join(cwd, "priv/spec/main.yml")
     app = Mix.Project.config()[:app]
     QuenyaBuilder.run(filename, app)

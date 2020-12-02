@@ -10,10 +10,15 @@ defmodule QuenyaBuilder.Router do
 
     mod_name = Util.gen_router_name(app)
 
-    preamble = gen_preamble()
-    contents = gen_contents(root["servers"], app)
+    uri =
+      Util.get_localhost_uri(root["servers"]) || raise "Must define localhost under servers in OAS3 spec."
 
-    ApiRouter.gen(doc, app, opts)
+    base_path = uri.path || "/"
+
+    preamble = gen_preamble()
+    contents = gen_contents(base_path, app)
+
+    ApiRouter.gen(doc, base_path, app, opts)
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
   end
@@ -32,11 +37,8 @@ defmodule QuenyaBuilder.Router do
     end
   end
 
-  defp gen_contents(servers, app) do
-    uri =
-      Util.get_localhost_uri(servers) || raise "Must define localhost under servers in OAS3 spec."
+  defp gen_contents(path, app) do
 
-    path = uri.path || "/"
     api_router_mod = Module.concat("Elixir", Util.gen_api_router_name(app))
 
     routes = [

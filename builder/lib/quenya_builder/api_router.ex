@@ -14,14 +14,14 @@ defmodule QuenyaBuilder.ApiRouter do
 
   alias QuenyaBuilder.Object
 
-  def gen(doc, app, opts \\ []) do
+  def gen(doc, base_path, app, opts \\ []) do
     mod_name = Util.gen_api_router_name(app)
 
     preamble = gen_preamble()
 
     contents =
       Enum.map(doc, fn {uri, ops} ->
-        gen_uri(uri, ops, app, opts)
+        gen_uri(uri, base_path, ops, app, opts)
       end)
       |> List.flatten()
 
@@ -45,7 +45,7 @@ defmodule QuenyaBuilder.ApiRouter do
     end
   end
 
-  defp gen_uri(uri, ops, app, opts) do
+  defp gen_uri(uri, base_path, ops, app, opts) do
     Enum.map(ops, fn {method, doc} ->
       name =
         doc["operationId"] ||
@@ -73,7 +73,9 @@ defmodule QuenyaBuilder.ApiRouter do
         |> Keyword.put(:type, :test)
         |> Keyword.update!(:path, fn _ -> "test/gen" end)
 
-      UnitTestGenerator.gen(method, uri, req, params, res, app, name, ut_opts)
+      if Application.get_env(:quenya, :gen_tests, true) do
+        UnitTestGenerator.gen(method, Path.join(base_path, uri), req, params, res, app, name, ut_opts)
+      end
 
       init_opts = gen_route_plug_opts(app, name)
 
