@@ -21,6 +21,13 @@ delete:
   operationId: deleteTodo
   tags: [todo]
   description: delete a todo item
+  parameters:
+    - name: todoId
+      in: path
+      required: true
+      description: The id of the pet to retrieve
+      schema:
+        $ref: "#/components/schemas/todoId"
   responses:
     "204":
       description: No content
@@ -30,6 +37,13 @@ patch:
   operationId: updateTodo
   tags: [todo]
   description: update todo status
+  parameters:
+    - name: todoId
+      in: path
+      required: true
+      description: The id of the pet to retrieve
+      schema:
+        $ref: "#/components/schemas/todoId"
   requestBody:
     description: todo item status
     required: true
