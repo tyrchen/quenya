@@ -14,6 +14,8 @@ Quenya is a framework to build high-quality REST API applications based on exten
 - Postprocessors:
   - [x] response validator to validate the response body and headers (for dev/testing purpose)
 
+Quenya will also generate property testing, it will use `Plug.Test` and `StreamData` to build tests. Requests (url, query, request headers and request body) will be generated and then sent to generated `Router`, then it will use the response schema to validate the result. Currently the testing only covers happy path.
+
 Quenya will also provide a set of modules, plugs, test helpers to help you build REST APIs easily.
 
 ## How to use Quenya?
