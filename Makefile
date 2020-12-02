@@ -18,6 +18,10 @@ credo:
 	@cd builder; mix credo
 	@mix credo
 
+update-dep:
+	@cd installer; rm mix.lock; mix deps.get
+	@cd builder; rm mix.lock; mix deps.get
+	@rm mix.lock; mix deps.get
 test-all: dep credo test
 
 install:

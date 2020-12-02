@@ -1,7 +1,7 @@
 defmodule QuenyaBuilder.MixProject do
   use Mix.Project
 
-  @version "0.2.1"
+  @version "0.3.0"
   def project do
     [
       app: :quenya_builder,
@@ -40,7 +40,7 @@ defmodule QuenyaBuilder.MixProject do
       # {:quenya, "~> 0.2"},
       # {:json_data_faker, "~> 0.1"},
       {:quenya, path: ".."},
-      {:json_data_faker, path: "../../json_data_faker"},
+      {:json_data_faker, "~> 0.2"},
       {:typed_struct, "~> 0.2.1"},
       {:stream_data, "~> 0.5"},
 
