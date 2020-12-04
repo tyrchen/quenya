@@ -1,8 +1,9 @@
-defmodule QuenyaBuilder.ResponseGenerator do
+defmodule QuenyaBuilder.FakeHandler do
   @moduledoc """
   Generate fake handler for response
   """
   require DynamicModule
+
   alias QuenyaBuilder.Util
   alias Quenya.ResponseHelper
 
@@ -12,24 +13,33 @@ defmodule QuenyaBuilder.ResponseGenerator do
     preamble = gen_preamble()
 
     {code, data} = ResponseHelper.choose_best_response(res)
-    header_schemas = Enum.map(data.headers, fn {k, v} -> {k, v.schema} end)
-    body_schemas = Enum.reduce(data.content, %{}, fn {k, v}, acc2 ->
-      Map.put(acc2, k, {k, v.schema})
-    end)
+    header_schemas = Enum.map(data.headers, fn {k, v} -> {k, v.schema, v.required} end)
 
-    header = case header_schemas do
-      v when v == %{} -> quote do
-      end
-      _ -> gen_header()
-    end
+    body_schemas =
+      Enum.reduce(data.content, %{}, fn {k, v}, acc2 ->
+        Map.put(acc2, k, {k, v.schema})
+      end)
 
-    body = case body_schemas do
-      v when v == %{} -> quote do
-        conn
-        |> send_resp(unquote(code), "")
+    header =
+      case header_schemas do
+        v when v == %{} ->
+          quote do
+          end
+
+        _ ->
+          gen_header()
       end
-      _ -> gen_body()
-    end
+
+    body =
+      case body_schemas do
+        v when v == %{} ->
+          quote do
+            send_resp(conn, unquote(code), "")
+          end
+
+        _ ->
+          gen_body()
+      end
 
     contents =
       quote do
@@ -45,7 +55,7 @@ defmodule QuenyaBuilder.ResponseGenerator do
     DynamicModule.gen(mod_name, preamble, contents, opts)
   end
 
-  def gen_preamble do
+  defp gen_preamble do
     quote do
       require Logger
       import Plug.Conn
@@ -59,8 +69,9 @@ defmodule QuenyaBuilder.ResponseGenerator do
   defp gen_header do
     quote do
       {_, schemas} = get_header_schemas()
+
       conn =
-        Enum.reduce(schemas, conn, fn {name, schema}, acc ->
+        Enum.reduce(schemas, conn, fn {name, schema, _required}, acc ->
           v =
             case Quenya.TestHelper.get_one(JsonDataFaker.generate(schema)) do
               v when is_binary(v) -> v
@@ -81,11 +92,8 @@ defmodule QuenyaBuilder.ResponseGenerator do
       {content_type, schema} =
         Enum.reduce_while(accepts, nil, fn type, _acc ->
           case(Map.get(schemas, type)) do
-            nil ->
-              {:cont, nil}
-
-            v ->
-              {:halt, v}
+            nil -> {:cont, nil}
+            v -> {:halt, v}
           end
         end) || schemas["application/json"] ||
           raise(

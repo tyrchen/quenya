@@ -1,15 +1,6 @@
 defmodule QuenyaBuilder.RequestValidator do
   @moduledoc """
   Build request validator module
-
-  Usage:
-
-  ```elixir
-  {:ok, root} = Quenya.Parser.parse("todo.yml")
-  doc = root["paths"]["/todos"]["get"]
-  # generate request validator for GET /todos
-  QuenyaBuilder.Request.gen(doc, :awesome_app, "listTodos")
-  ```
   """
   require DynamicModule
 
@@ -22,16 +13,26 @@ defmodule QuenyaBuilder.RequestValidator do
 
     param_data = Enum.map(params, fn p -> {p.name, p.position, p.required, p.schema} end)
     body_schemas = Enum.reduce(req.content, %{}, fn {k, v}, acc -> Map.put(acc, k, v.schema) end)
-    param_validator = case param_data do
-      [] -> quote do
+
+    param_validator =
+      case param_data do
+        [] ->
+          quote do
+          end
+
+        _ ->
+          gen_parameter_validator()
       end
-      _ -> gen_parameter_validator()
-    end
-    body_validator = case body_schemas do
-      v when v == %{} -> quote do
+
+    body_validator =
+      case body_schemas do
+        v when v == %{} ->
+          quote do
+          end
+
+        _ ->
+          gen_body_validator()
       end
-      _ -> gen_body_validator()
-    end
 
     contents =
       quote do
@@ -63,6 +64,7 @@ defmodule QuenyaBuilder.RequestValidator do
   defp gen_parameter_validator do
     quote do
       data = get_params()
+
       context =
         Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
           v = Quenya.RequestHelper.get_param(conn, name, position, schema.schema)
@@ -82,7 +84,7 @@ defmodule QuenyaBuilder.RequestValidator do
 
   defp gen_body_validator do
     quote do
-      content_type = Quenya.RequestHelper.get_content_type(conn)
+      content_type = Quenya.RequestHelper.get_content_type(conn, "header")
       schemas = get_body_schemas()
 
       data =

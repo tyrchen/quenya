@@ -10,7 +10,7 @@ import Config
 # Configures quenya API pipelines
 config :quenya,
   use_fake_handler: true,
-  use_response_validator: false,
+  use_response_validator: true,
   apis: %{}
 
 # Configures ex_json_schema to use Quenya.FormatValidator for unkown format

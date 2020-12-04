@@ -7,8 +7,8 @@ defmodule QuenyaBuilder.ApiRouter do
   alias QuenyaBuilder.{
     RequestValidator,
     ResponseValidator,
-    ResponseGenerator,
-    UnitTestGenerator,
+    FakeHandler,
+    UnitTest,
     Util
   }
 
@@ -65,7 +65,7 @@ defmodule QuenyaBuilder.ApiRouter do
       end
 
       if Application.get_env(:quenya, :use_fake_handler, true) do
-        ResponseGenerator.gen(res, app, name, new_opts)
+        FakeHandler.gen(res, app, name, new_opts)
       end
 
       ut_opts =
@@ -74,7 +74,7 @@ defmodule QuenyaBuilder.ApiRouter do
         |> Keyword.update!(:path, fn _ -> "test/gen" end)
 
       if Application.get_env(:quenya, :gen_tests, true) do
-        UnitTestGenerator.gen(method, Path.join(base_path, uri), req, params, res, app, name, ut_opts)
+        UnitTest.gen(method, Path.join(base_path, uri), req, params, res, app, name, ut_opts)
       end
 
       init_opts = gen_route_plug_opts(app, name)

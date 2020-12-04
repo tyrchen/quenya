@@ -35,8 +35,8 @@ defmodule Quenya.RequestHelper do
 
   def get_param(conn, name, "cookie", schema), do: normalize_param(conn.cookies[name], schema)
 
-  def get_content_type(conn) do
-    v = get_param(conn, "content-type", "header", nil) || ""
+  def get_content_type(conn, position) do
+    v = get_param(conn, "content-type", position, nil) || ""
     [result | _] = String.split(v, ";")
     result
   end
