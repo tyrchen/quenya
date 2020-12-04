@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.UnitTestGenerator do
+defmodule QuenyaBuilder.UnitTest do
   @moduledoc """
   Generate unit tests based on spec
   """

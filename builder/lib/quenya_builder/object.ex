@@ -148,9 +148,9 @@ defmodule QuenyaBuilder.Object do
   defp get_schema(id, position, name, data) do
     schema =
       data["schema"] ||
-        raise "#{id}: shall define schema in the #{inspect(position)} for #{
-                inspect(name)
-              }. data: #{inspect(data)}"
+        raise "#{id}: shall define schema in the #{inspect(position)} for #{inspect(name)}. data: #{
+                inspect(data)
+              }"
 
     # schema example is deprecated and is unnecessary for json schema validation
     Schema.resolve(Map.delete(schema, "example"))

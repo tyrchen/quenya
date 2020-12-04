@@ -1,15 +1,6 @@
 defmodule QuenyaBuilder.RequestValidator do
   @moduledoc """
   Build request validator module
-
-  Usage:
-
-  ```elixir
-  {:ok, root} = Quenya.Parser.parse("todo.yml")
-  doc = root["paths"]["/todos"]["get"]
-  # generate request validator for GET /todos
-  QuenyaBuilder.Request.gen(doc, :awesome_app, "listTodos")
-  ```
   """
   require DynamicModule
 
@@ -20,8 +11,28 @@ defmodule QuenyaBuilder.RequestValidator do
 
     preamble = gen_preamble()
 
-    param_validator = gen_parameter_validator(params)
-    body_validator = gen_body_validator(req)
+    param_data = Enum.map(params, fn p -> {p.name, p.position, p.required, p.schema} end)
+    body_schemas = Enum.reduce(req.content, %{}, fn {k, v}, acc -> Map.put(acc, k, v.schema) end)
+
+    param_validator =
+      case param_data do
+        [] ->
+          quote do
+          end
+
+        _ ->
+          gen_parameter_validator()
+      end
+
+    body_validator =
+      case body_schemas do
+        v when v == %{} ->
+          quote do
+          end
+
+        _ ->
+          gen_body_validator()
+      end
 
     contents =
       quote do
@@ -31,6 +42,9 @@ defmodule QuenyaBuilder.RequestValidator do
           unquote(body_validator)
           assign(conn, :request_context, context)
         end
+
+        def get_params, do: unquote(param_data)
+        def get_body_schemas, do: unquote(body_schemas)
       end
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
@@ -47,20 +61,10 @@ defmodule QuenyaBuilder.RequestValidator do
     end
   end
 
-  defp gen_parameter_validator([]) do
+  defp gen_parameter_validator do
     quote do
-    end
-  end
+      data = get_params()
 
-  defp gen_parameter_validator(params) do
-    data =
-      params
-      |> Enum.map(fn p ->
-        {p.name, p.position, p.required, p.schema}
-      end)
-      |> Macro.escape()
-
-    quote bind_quoted: [data: data] do
       context =
         Enum.reduce(data, context, fn {name, position, required, schema}, acc ->
           v = Quenya.RequestHelper.get_param(conn, name, position, schema.schema)
@@ -78,46 +82,30 @@ defmodule QuenyaBuilder.RequestValidator do
     end
   end
 
-  defp gen_body_validator(nil) do
+  defp gen_body_validator do
     quote do
-    end
-  end
+      content_type = Quenya.RequestHelper.get_content_type(conn, "header")
+      schemas = get_body_schemas()
 
-  defp gen_body_validator(body) do
-    schemas =
-      Enum.reduce(body.content, %{}, fn {k, v}, acc ->
-        Map.put(acc, k, v.schema)
-      end)
-
-    case Enum.empty?(schemas) do
-      true ->
-        quote do
+      data =
+        case Map.get(conn.body_params, "_json") do
+          nil -> conn.body_params
+          v -> v
         end
 
-      _ ->
-        quote bind_quoted: [schemas: schemas |> Macro.escape()] do
-          content_type = Quenya.RequestHelper.get_content_type(conn)
+      schema =
+        schemas[content_type] ||
+          raise(
+            Plug.BadRequestError,
+            "Unsupported request content type #{content_type}. Supported content type: #{
+              inspect(Map.keys(schemas))
+            }"
+          )
 
-          data =
-            case Map.get(conn.body_params, "_json") do
-              nil -> conn.body_params
-              v -> v
-            end
-
-          schema =
-            schemas[content_type] ||
-              raise(
-                Plug.BadRequestError,
-                "Unsupported request content type #{content_type}. Supported content type: #{
-                  inspect(Map.keys(schemas))
-                }"
-              )
-
-          case ExJsonSchema.Validator.validate(schema, data) do
-            {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
-            :ok -> :ok
-          end
-        end
+      case ExJsonSchema.Validator.validate(schema, data) do
+        {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
+        :ok -> :ok
+      end
     end
   end
 end

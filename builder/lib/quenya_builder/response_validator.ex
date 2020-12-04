@@ -1,14 +1,6 @@
 defmodule QuenyaBuilder.ResponseValidator do
   @moduledoc """
   Build response validator module
-
-  Usage:
-
-  ```elixir
-  {:ok, root} = Quenya.Parser.parse("todo.yml")
-  doc = root["paths"]["/todos"]["get"]
-  # generate response validator for GET /todos
-  QuenyaBuilder.Response.gen(doc, :awesome_app, "listTodos")
   ```
   """
   require DynamicModule
@@ -20,8 +12,11 @@ defmodule QuenyaBuilder.ResponseValidator do
 
     preamble = gen_preamble()
 
-    header_validator = gen_header_validators(res)
-    body_validator = gen_body_validators(res)
+    header_schemas = Util.shrink_response_data(res, "headers")
+    body_schemas = Util.shrink_response_data(res, "content")
+
+    header_validator = gen_header()
+    body_validator = gen_body()
 
     contents =
       quote do
@@ -30,6 +25,9 @@ defmodule QuenyaBuilder.ResponseValidator do
           unquote(body_validator)
           conn
         end
+
+        def get_header_schemas, do: unquote(header_schemas)
+        def get_body_schemas, do: unquote(body_schemas)
       end
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
@@ -38,7 +36,6 @@ defmodule QuenyaBuilder.ResponseValidator do
   defp gen_preamble do
     quote do
       require Logger
-      import Plug.Conn
 
       alias ExJsonSchema.Validator
       alias Quenya.RequestHelper
@@ -49,58 +46,70 @@ defmodule QuenyaBuilder.ResponseValidator do
     end
   end
 
-  defp gen_header_validators(data) do
-    schemas = Util.get_response_schemas(data, "headers")
+  defp gen_header do
+    quote do
+      schemas = get_header_schemas()
+      schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
 
-    case Enum.empty?(schemas) do
-      true ->
-        quote do
+      Enum.reduce_while(schemas_with_code, :ok, fn {name, {_, schema, required}}, _acc ->
+        v = RequestHelper.get_param(conn, name, "resp_header", schema.schema)
+        if required, do: RequestHelper.validate_required(v, required, "resp_header")
+
+        case Validator.validate(schema, v) do
+          {:error, [{msg, _} | _]} ->
+            {:halt,
+             raise("Failed to validate header #{name} with value: #{inspect(v)}. Errors: #{msg}")}
+
+          :ok ->
+            {:cont, :ok}
         end
-
-      _ ->
-        quote bind_quoted: [schemas: schemas |> Macro.escape()] do
-          schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
-
-          Enum.map(schemas_with_code, fn {name, schema} ->
-            v = RequestHelper.get_param(conn, name, "resp_header", schemas[:schema])
-            required = schema[:required]
-            if required, do: RequestHelper.validate_required(v, required, "resp_header")
-
-            case Validator.validate(schema[:schema], v) do
-              {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
-              :ok -> :ok
-            end
-          end)
-        end
+      end)
     end
   end
 
-  defp gen_body_validators(data) do
-    schemas =
-      Util.get_response_schemas(data, "content")
-      |> Macro.escape()
-
-    quote bind_quoted: [schemas: schemas] do
-      accepts = RequestHelper.get_accept(conn)
+  defp gen_body do
+    quote do
+      schemas = get_body_schemas()
       schemas_with_code = schemas[Integer.to_string(conn.status)] || schemas["default"]
+      content_type = Quenya.RequestHelper.get_content_type(conn, "resp_header")
 
-      schema =
-        Enum.reduce_while(accepts, nil, fn type, _acc ->
-          case Map.get(schemas_with_code, type) do
-            nil -> {:cont, nil}
-            v -> {:halt, v}
-          end
-        end) || schemas_with_code["application/json"] ||
-          raise(
-            Plug.BadRequestError,
-            "accept content type #{inspect(accepts)} is not supported"
-          )
+      {_type, schema, _} =
+        case Map.get(schemas_with_code, content_type) do
+          nil -> {content_type, nil, false}
+          v -> v
+        end
 
-      data = conn.resp_body
+      accepts = Quenya.RequestHelper.get_accept(conn)
 
-      case Validator.validate(schema[:schema], data) do
-        {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
-        :ok -> :ok
+      _ = Enum.reduce_while(accepts, :ok, fn type, _acc ->
+        case String.contains?(type, content_type) or String.contains?(type, "*/*") do
+          true ->
+            {:halt, :ok}
+
+          _ ->
+            {:halt,
+             raise(
+               "accept content type #{inspect(type)} is not the same as content type #{
+                 content_type
+               }"
+             )}
+        end
+      end)
+
+      if schema != nil do
+        case Quenya.ResponseHelper.decode(content_type, conn.resp_body) do
+          "" ->
+            :ok
+
+          v ->
+            case Validator.validate(schema, v) do
+              {:error, [{msg, _} | _]} ->
+                raise("Failed to validate body with value: #{inspect(v)}. Errors: #{msg}")
+
+              :ok ->
+                :ok
+            end
+        end
       end
     end
   end

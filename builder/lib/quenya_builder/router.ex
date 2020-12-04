@@ -11,7 +11,8 @@ defmodule QuenyaBuilder.Router do
     mod_name = Util.gen_router_name(app)
 
     uri =
-      Util.get_localhost_uri(root["servers"]) || raise "Must define localhost under servers in OAS3 spec."
+      Util.get_localhost_uri(root["servers"]) ||
+        raise "Must define localhost under servers in OAS3 spec."
 
     base_path = uri.path || "/"
 
@@ -38,7 +39,6 @@ defmodule QuenyaBuilder.Router do
   end
 
   defp gen_contents(path, app) do
-
     api_router_mod = Module.concat("Elixir", Util.gen_api_router_name(app))
 
     routes = [
@@ -50,14 +50,22 @@ defmodule QuenyaBuilder.Router do
       end
     ]
 
-    match_all = case path do
-      "/" -> [quote do
+    match_all =
+      case path do
+        "/" ->
+          [
+            quote do
+            end
+          ]
 
-      end]
-      _ -> [quote do
-        match(_, to: Quenya.Plug.MathAllPlug, init_opts: [])
-      end]
-    end
+        _ ->
+          [
+            quote do
+              match(_, to: Quenya.Plug.MathAllPlug, init_opts: [])
+            end
+          ]
+      end
+
     Util.gen_router_preamble() ++ routes ++ match_all
   end
 end

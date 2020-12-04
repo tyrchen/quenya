@@ -52,7 +52,7 @@ defmodule QuenyaBuilder.Util do
     end)
   end
 
-  def get_response_schemas(data, position) when position in ["headers", "content"] do
+  def shrink_response_data(data, position) when position in ["headers", "content"] do
     Enum.reduce(data, %{}, fn {code, item}, acc1 ->
       item =
         case position do
@@ -62,7 +62,7 @@ defmodule QuenyaBuilder.Util do
 
       result1 =
         Enum.reduce(item, %{}, fn {k, v}, acc2 ->
-          Map.put(acc2, k, schema: v.schema, required: Map.get(v, :required) || false)
+          Map.put(acc2, k, {k, v.schema, Map.get(v, :required) || false})
         end)
 
       Map.put(acc1, code, result1)
