@@ -1,10 +1,17 @@
-on: push
-
 name: build
+on:
+  push:
+    paths-ignore:
+      - "*.md"
+      - Makefile
+      - "docs/**"
+      - examples
+      - ".gitignore"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
     name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
     strategy:
       matrix:
