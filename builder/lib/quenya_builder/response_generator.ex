@@ -10,8 +10,26 @@ defmodule QuenyaBuilder.ResponseGenerator do
     mod_name = Util.gen_fake_handler_name(app, name)
 
     preamble = gen_preamble()
-    header = gen_header(res)
-    body = gen_body(res)
+
+    {code, data} = ResponseHelper.choose_best_response(res)
+    header_schemas = Enum.map(data.headers, fn {k, v} -> {k, v.schema} end)
+    body_schemas = Enum.reduce(data.content, %{}, fn {k, v}, acc2 ->
+      Map.put(acc2, k, {k, v.schema})
+    end)
+
+    header = case header_schemas do
+      v when v == %{} -> quote do
+      end
+      _ -> gen_header()
+    end
+
+    body = case body_schemas do
+      v when v == %{} -> quote do
+        conn
+        |> send_resp(unquote(code), "")
+      end
+      _ -> gen_body()
+    end
 
     contents =
       quote do
@@ -19,6 +37,9 @@ defmodule QuenyaBuilder.ResponseGenerator do
           unquote(header)
           unquote(body)
         end
+
+        def get_header_schemas, do: {unquote(code), unquote(header_schemas)}
+        def get_body_schemas, do: {unquote(code), unquote(body_schemas)}
       end
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
@@ -35,70 +56,48 @@ defmodule QuenyaBuilder.ResponseGenerator do
     end
   end
 
-  defp gen_header(data) do
-    schemas = Util.get_response_schemas(data, "headers")
-    {_code, schemas_with_code} = ResponseHelper.choose_best_response(schemas)
+  defp gen_header do
+    quote do
+      {_, schemas} = get_header_schemas()
+      conn =
+        Enum.reduce(schemas, conn, fn {name, schema}, acc ->
+          v =
+            case Quenya.TestHelper.get_one(JsonDataFaker.generate(schema)) do
+              v when is_binary(v) -> v
+              v when is_integer(v) -> Integer.to_string(v)
+              v -> "#{inspect(v)}"
+            end
 
-    case Enum.empty?(schemas_with_code) do
-      true ->
-        quote do
-        end
-
-      _ ->
-        quote bind_quoted: [schemas_with_code: Macro.escape(schemas_with_code)] do
-          conn =
-            Enum.reduce(schemas_with_code, conn, fn {name, schema}, acc ->
-              v =
-                case Quenya.TestHelper.get_one(JsonDataFaker.generate(schema[:schema])) do
-                  v when is_binary(v) -> v
-                  v when is_integer(v) -> Integer.to_string(v)
-                  v -> "#{inspect(v)}"
-                end
-
-              Plug.Conn.put_resp_header(acc, name, v)
-            end)
-        end
+          Plug.Conn.put_resp_header(acc, name, v)
+        end)
     end
   end
 
-  defp gen_body(data) do
-    schemas = Util.get_response_schemas(data, "content")
+  defp gen_body do
+    quote do
+      {code, schemas} = get_body_schemas()
+      accepts = Quenya.RequestHelper.get_accept(conn)
 
-    {code, schema} = ResponseHelper.choose_best_response(schemas)
+      {content_type, schema} =
+        Enum.reduce_while(accepts, nil, fn type, _acc ->
+          case(Map.get(schemas, type)) do
+            nil ->
+              {:cont, nil}
 
-    case Enum.empty?(schema) do
-      true ->
-        quote do
-          conn
-          |> send_resp(unquote(code), "")
-        end
+            v ->
+              {:halt, v}
+          end
+        end) || schemas["application/json"] ||
+          raise(
+            Plug.BadRequestError,
+            "accept content type #{inspect(accepts)} is not supported"
+          )
 
-      _ ->
-        quote bind_quoted: [schemas_with_code: Macro.escape(schema), code: code] do
-          accepts = Quenya.RequestHelper.get_accept(conn)
+      resp = Quenya.TestHelper.get_one(JsonDataFaker.generate(schema)) || ""
 
-          schema =
-            Enum.reduce_while(accepts, nil, fn type, _acc ->
-              case(Map.get(schemas_with_code, type)) do
-                nil ->
-                  {:cont, nil}
-
-                v ->
-                  {:halt, Keyword.put(v, :content_type, type)}
-              end
-            end) || schemas_with_code["application/json"] ||
-              raise(
-                Plug.BadRequestError,
-                "accept content type #{inspect(accepts)} is not supported"
-              )
-
-          content_type = Keyword.get(schema, :content_type, "application/json")
-          resp = Quenya.TestHelper.get_one(JsonDataFaker.generate(schema[:schema])) || ""
-
-          conn
-          |> put_resp_content_type(content_type)
-          |> send_resp(code, Quenya.ResponseHelper.encode(content_type, resp))
-        end
+      conn
+      |> put_resp_content_type(content_type)
+      |> send_resp(code, Quenya.ResponseHelper.encode(content_type, resp))
     end
   end
 end
