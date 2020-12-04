@@ -81,7 +81,7 @@ defmodule QuenyaBuilder.ResponseValidator do
 
       accepts = Quenya.RequestHelper.get_accept(conn)
 
-      Enum.reduce_while(accepts, :ok, fn type, _acc ->
+      _ = Enum.reduce_while(accepts, :ok, fn type, _acc ->
         case String.contains?(type, content_type) or String.contains?(type, "*/*") do
           true ->
             {:halt, :ok}
