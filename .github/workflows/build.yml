@@ -34,6 +34,4 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-
-      - uses: pre-commit/action@v2.0.0
       - run: make test-all
