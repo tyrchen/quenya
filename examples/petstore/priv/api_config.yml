@@ -1,0 +1,160 @@
+---
+addPet:
+  preprocessors:
+    - Petstore.Gen.AddPet.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.AddPet.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.AddPet.ResponseValidator: {}
+
+updatePet:
+  preprocessors:
+    - Petstore.Gen.UpdatePet.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UpdatePet.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.UpdatePet.ResponseValidator: {}
+
+findPetsByStatus:
+  preprocessors:
+    - Petstore.Gen.FindPetsByStatus.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.FindPetsByStatus.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.FindPetsByStatus.ResponseValidator: {}
+
+findPetsByTags:
+  preprocessors:
+    - Petstore.Gen.FindPetsByTags.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.FindPetsByTags.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.FindPetsByTags.ResponseValidator: {}
+
+deletePet:
+  preprocessors:
+    - Petstore.Gen.DeletePet.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.DeletePet.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.DeletePet.ResponseValidator: {}
+
+getPetById:
+  preprocessors:
+    - Petstore.Gen.GetPetById.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetPetById.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.GetPetById.ResponseValidator: {}
+
+updatePetWithForm:
+  preprocessors:
+    - Petstore.Gen.UpdatePetWithForm.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UpdatePetWithForm.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.UpdatePetWithForm.ResponseValidator: {}
+
+uploadFile:
+  preprocessors:
+    - Petstore.Gen.UploadFile.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UploadFile.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.UploadFile.ResponseValidator: {}
+
+getInventory:
+  preprocessors:
+    - Petstore.Gen.GetInventory.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetInventory.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.GetInventory.ResponseValidator: {}
+
+placeOrder:
+  preprocessors:
+    - Petstore.Gen.PlaceOrder.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.PlaceOrder.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.PlaceOrder.ResponseValidator: {}
+
+deleteOrder:
+  preprocessors:
+    - Petstore.Gen.DeleteOrder.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.DeleteOrder.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.DeleteOrder.ResponseValidator: {}
+
+getOrderById:
+  preprocessors:
+    - Petstore.Gen.GetOrderById.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetOrderById.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.GetOrderById.ResponseValidator: {}
+
+createUser:
+  preprocessors:
+    - Petstore.Gen.CreateUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.CreateUser.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.CreateUser.ResponseValidator: {}
+
+createUsersWithArrayInput:
+  preprocessors:
+    - Petstore.Gen.CreateUsersWithArrayInput.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.CreateUsersWithArrayInput.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.CreateUsersWithArrayInput.ResponseValidator: {}
+
+createUsersWithListInput:
+  preprocessors:
+    - Petstore.Gen.CreateUsersWithListInput.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.CreateUsersWithListInput.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.CreateUsersWithListInput.ResponseValidator: {}
+
+loginUser:
+  preprocessors:
+    - Petstore.Gen.LoginUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.LoginUser.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.LoginUser.ResponseValidator: {}
+
+logoutUser:
+  preprocessors:
+    - Petstore.Gen.LogoutUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.LogoutUser.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.LogoutUser.ResponseValidator: {}
+
+deleteUser:
+  preprocessors:
+    - Petstore.Gen.DeleteUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.DeleteUser.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.DeleteUser.ResponseValidator: {}
+
+getUserByName:
+  preprocessors:
+    - Petstore.Gen.GetUserByName.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetUserByName.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.GetUserByName.ResponseValidator: {}
+
+updateUser:
+  preprocessors:
+    - Petstore.Gen.UpdateUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UpdateUser.FakeHandler: {}
+  postprocessors:
+    - Petstore.Gen.UpdateUser.ResponseValidator: {}

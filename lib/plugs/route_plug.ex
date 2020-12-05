@@ -11,9 +11,9 @@ defmodule Quenya.Plug.RoutePlug do
   Note this plug shall be used after Plug.Parsers since it will access request body (if any)
   ## Options
 
-    * `:preprocessors` - a list of plug, execute in order before executing handlers
-    * `:handlers` - a list of plug to process request and generate response
-    * `:postprocessors` - a list of plug that will be executed in order before send
+    * `:preprocessors` - a list of plugs, execute in order before executing handlers
+    * `:handlers` - a list of plugs to process request and generate response
+    * `:postprocessors` - a list of plugs that will be executed in order before send
   """
 
   alias Plug.Conn
@@ -43,8 +43,8 @@ defmodule Quenya.Plug.RoutePlug do
     end
   end
 
-  defp apply_pipe(mod, conn) do
-    case apply(mod, :call, [conn, []]) do
+  defp apply_pipe({mod, opts}, conn) do
+    case apply(mod, :call, [conn, opts]) do
       %Plug.Conn{halted: true} = result -> {:halt, result}
       %Plug.Conn{} = result -> {:cont, result}
       other -> raise "All pipes must return Plug.Conn.t. Got #{inspect(other)}"
@@ -54,8 +54,8 @@ defmodule Quenya.Plug.RoutePlug do
   defp register_postprocessors(conn, processors) when is_list(processors) do
     processors
     |> Enum.reverse()
-    |> Enum.reduce(conn, fn mod, acc ->
-      Conn.register_before_send(acc, &apply(mod, :call, [&1, []]))
+    |> Enum.reduce(conn, fn {mod, opts}, acc ->
+      Conn.register_before_send(acc, &apply(mod, :call, [&1, opts]))
     end)
   end
 

@@ -20,7 +20,7 @@ on:
       - ".gitignore"
 
 jobs:
-  test:
+  quenya:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
@@ -34,5 +34,69 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+      - name: quenya deps cache
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-quenya-${{ hashFiles('mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya
+      - name: Install dependencies
+        run: mix deps.get
+      - name: run credo
+        run: mix credo
+      - name: Run tests
+        run: mix test
 
-      - run: make test-all
+  quenya-installer:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: [23.1]
+        elixir: [1.11]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - name: quenya installer deps cache
+        uses: actions/cache@v2
+        with:
+          path: installer/deps
+          key: ${{ runner.os }}-quenya-installer-${{ hashFiles('installer/mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya-installer-
+      - name: Install dependencies
+        run: cd installer && mix deps.get
+      - name: run credo
+        run: cd installer && mix credo
+      - name: Run tests
+        run: cd installer && mix test
+
+  quenya-builder:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: [23.1]
+        elixir: [1.11]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - name: quenya builder deps cache
+        uses: actions/cache@v2
+        with:
+          path: builder/deps
+          key: ${{ runner.os }}-quenya-builder-${{ hashFiles('builder/mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya-builder-
+      - name: Install dependencies
+        run: cd builder && mix deps.get
+      - name: run credo
+        run: cd builder && mix credo
+      - name: Run tests
+        run: cd builder && mix test

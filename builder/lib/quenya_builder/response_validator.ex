@@ -81,20 +81,21 @@ defmodule QuenyaBuilder.ResponseValidator do
 
       accepts = Quenya.RequestHelper.get_accept(conn)
 
-      _ = Enum.reduce_while(accepts, :ok, fn type, _acc ->
-        case String.contains?(type, content_type) or String.contains?(type, "*/*") do
-          true ->
-            {:halt, :ok}
+      _ =
+        Enum.reduce_while(accepts, :ok, fn type, _acc ->
+          case String.contains?(type, content_type) or String.contains?(type, "*/*") do
+            true ->
+              {:halt, :ok}
 
-          _ ->
-            {:halt,
-             raise(
-               "accept content type #{inspect(type)} is not the same as content type #{
-                 content_type
-               }"
-             )}
-        end
-      end)
+            _ ->
+              {:halt,
+               raise(
+                 "accept content type #{inspect(type)} is not the same as content type #{
+                   content_type
+                 }"
+               )}
+          end
+        end)
 
       if schema != nil do
         case Quenya.ResponseHelper.decode(content_type, conn.resp_body) do
