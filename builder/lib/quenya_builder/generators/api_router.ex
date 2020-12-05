@@ -135,10 +135,11 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
     res_validator_mod = Module.concat("Elixir", Util.gen_response_validator_name(app, name))
     fake_handler_mod = Module.concat("Elixir", Util.gen_fake_handler_name(app, name))
 
-    preprocessors = case Security.get_plug(security_data) do
-      nil -> [{req_validator_mod, []}]
-      security_plug -> [{security_plug, []}, {req_validator_mod, []}]
-    end
+    preprocessors =
+      case Security.get_plug(security_data) do
+        nil -> [{req_validator_mod, []}]
+        security_plug -> [{security_plug, []}, {req_validator_mod, []}]
+      end
 
     [
       preprocessors: preprocessors,
@@ -147,7 +148,24 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
     ]
   end
 
-  defp gen_route_plug_opts(_app, _name, _security_data, data), do: data
+  defp gen_route_plug_opts(app, name, security_data, data) do
+    data_from_spec = gen_route_plug_opts(app, name, security_data, nil)
+
+    # we want to preserve user modified config, while still pickup the changes from
+    # the OpenAPI spec. say, user added new security config in an existing operation,
+    # we need to make sure it is properly picked up.
+    DeepMerge.deep_merge(data_from_spec, data, fn
+      _, original, override when is_list(original) and is_list(override) ->
+        case Keyword.keyword?(original) do
+          true -> DeepMerge.continue_deep_merge()
+          _ -> (original ++ override) |> Enum.dedup_by(fn {x, _} -> x end)
+        end
+        override
+
+      _, _original, _override ->
+        DeepMerge.continue_deep_merge()
+    end)
+  end
 
   defp save_config(config_file, data) do
     config_data =

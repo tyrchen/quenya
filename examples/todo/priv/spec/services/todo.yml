@@ -39,6 +39,8 @@ patch:
   operationId: updateTodo
   tags: [todo]
   description: update todo status
+  security:
+    - token: []
   parameters:
     - name: todoId
       in: path

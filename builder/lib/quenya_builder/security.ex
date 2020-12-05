@@ -16,6 +16,7 @@ defmodule QuenyaBuilder.Security do
   end
 
   def get_scheme(_schemes, nil, _opts), do: nil
+
   def get_scheme(schemes, name, opts) do
     case Map.get(schemes, name) do
       nil -> raise "Security scheme #{name} is not supported in #{inspect(schemes)}"
@@ -29,5 +30,5 @@ defmodule QuenyaBuilder.Security do
   def get_plug({%SecurityScheme{type: "http", scheme: "bearer", bearerFormat: "JWT"}, _opts}),
     do: Quenya.Plug.JwtPlug
 
-  def get_plug(scheme), do: raise("Unsupported security scheme: #{inspect scheme}")
+  def get_plug(scheme), do: raise("Unsupported security scheme: #{inspect(scheme)}")
 end

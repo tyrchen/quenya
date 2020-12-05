@@ -157,6 +157,13 @@ defmodule TodoTest.Gen.UpdateTodo do
   end
 
   def security_data do
-    nil
+    {%QuenyaBuilder.Object.SecurityScheme{
+       bearerFormat: "JWT",
+       description: "",
+       name: "",
+       position: "",
+       scheme: "bearer",
+       type: "http"
+     }, []}
   end
 end
