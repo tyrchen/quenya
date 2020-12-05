@@ -1,12 +1,14 @@
-defmodule QuenyaBuilder.Router do
+defmodule QuenyaBuilder.Generator.Router do
   @moduledoc """
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
-  alias QuenyaBuilder.{ApiRouter, Util}
+  alias QuenyaBuilder.{Generator.ApiRouter, Util}
 
   def gen(root, app, opts \\ []) do
-    doc = root["paths"] || raise "No route definition in schema"
+    if root["paths"] == nil do
+      raise "No route definition in schema"
+    end
 
     mod_name = Util.gen_router_name(app)
 
@@ -19,7 +21,7 @@ defmodule QuenyaBuilder.Router do
     preamble = gen_preamble()
     contents = gen_contents(base_path, app)
 
-    ApiRouter.gen(doc, base_path, app, opts)
+    ApiRouter.gen(root, base_path, app, opts)
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
   end

@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.ResponseValidator do
+defmodule QuenyaBuilder.Generator.ResponseValidator do
   @moduledoc """
   Build response validator module
   ```

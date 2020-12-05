@@ -1,21 +1,22 @@
-defmodule QuenyaBuilder.ApiRouter do
+defmodule QuenyaBuilder.Generator.ApiRouter do
   @moduledoc """
   Generate Plug router based on OAPIv3 spec
   """
   require DynamicModule
 
-  alias QuenyaBuilder.{
+  alias QuenyaBuilder.Generator.{
     Config,
     RequestValidator,
     ResponseValidator,
     FakeHandler,
-    UnitTest,
-    Util
+    UnitTest
   }
+
+  alias QuenyaBuilder.{Security, Util}
 
   alias QuenyaBuilder.Object
 
-  def gen(doc, base_path, app, opts \\ []) do
+  def gen(root, base_path, app, opts \\ []) do
     mod_name = Util.gen_api_router_name(app)
 
     preamble = gen_preamble()
@@ -25,26 +26,29 @@ defmodule QuenyaBuilder.ApiRouter do
     config =
       case File.exists?(config_file) do
         true -> Config.load(config_file)
-        _ -> nil
+        _ -> %{}
       end
 
+    sec_schemes = Object.gen_security_schemes(root["components"]["securitySchemes"])
+    security = Security.ensure(root["security"] || [])
+
     data =
-      doc
-      |> Enum.map(fn {uri, ops} -> gen_uri(uri, base_path, ops, app, config, opts) end)
+      root["paths"]
+      |> Enum.map(fn {uri, ops} ->
+        op_opts = [
+          uri: uri,
+          base_path: base_path,
+          app: app,
+          config: config,
+          sec_schemes: sec_schemes,
+          security: security
+        ]
+
+        gen_uri(ops, op_opts, opts)
+      end)
       |> List.flatten()
 
-    case File.exists?(config_file) do
-      false ->
-        config_data =
-          Enum.map(data, fn {name, _method, _uri, opts} ->
-            {name, opts[:preprocessors], opts[:handlers], opts[:postprocessors]}
-          end)
-
-        Config.save(config_file, config_data)
-
-      _ ->
-        nil
-    end
+    save_config(config_file, data)
 
     contents =
       Enum.map(data, fn {_name, method, uri, init_opts} ->
@@ -73,8 +77,22 @@ defmodule QuenyaBuilder.ApiRouter do
     end
   end
 
-  defp gen_uri(uri, base_path, ops, app, config, opts) do
+  defp gen_uri(ops, op_opts, mod_opts) do
     Enum.map(ops, fn {method, doc} ->
+      [
+        uri: uri,
+        base_path: base_path,
+        app: app,
+        config: config,
+        sec_schemes: sec_schemes,
+        security: security
+      ] = op_opts
+
+      {scheme_name, scheme_opts} =
+        Security.ensure(doc["security"] || security) |> Security.normalize()
+
+      security_data = Security.get_scheme(sec_schemes, scheme_name, scheme_opts)
+
       name =
         doc["operationId"] ||
           raise "Must define operationId for #{uri} with method #{method}. It will be used to generate module name"
@@ -85,43 +103,58 @@ defmodule QuenyaBuilder.ApiRouter do
       params = Object.gen_param_objects(name, doc["parameters"])
       res = Object.gen_res_objects(name, doc["responses"])
 
-      new_opts = Keyword.update!(opts, :path, &Path.join(&1, name))
-      RequestValidator.gen(req, params, app, name, new_opts)
+      new_mod_opts = Keyword.update!(mod_opts, :path, &Path.join(&1, name))
+      RequestValidator.gen(req, params, app, name, new_mod_opts)
 
       if Application.get_env(:quenya, :use_response_validator, true) do
-        ResponseValidator.gen(res, app, name, new_opts)
+        ResponseValidator.gen(res, app, name, new_mod_opts)
       end
 
       if Application.get_env(:quenya, :use_fake_handler, true) do
-        FakeHandler.gen(res, app, name, new_opts)
+        FakeHandler.gen(res, app, name, new_mod_opts)
       end
 
-      ut_opts =
-        new_opts
+      ut_mod_opts =
+        new_mod_opts
         |> Keyword.put(:type, :test)
         |> Keyword.update!(:path, fn _ -> "test/gen" end)
 
       if Application.get_env(:quenya, :gen_tests, true) do
-        UnitTest.gen(method, Path.join(base_path, uri), req, params, res, app, name, ut_opts)
+        data = [req: req, params: params, res: res, security_data: security_data]
+        UnitTest.gen(method, Path.join(base_path, uri), data, app, name, ut_mod_opts)
       end
 
-      init_opts = gen_route_plug_opts(app, name, config[name])
+      init_opts = gen_route_plug_opts(app, name, security_data, config[name])
       uri = Util.normalize_uri(uri)
       {name, method, uri, init_opts}
     end)
   end
 
-  defp gen_route_plug_opts(app, name, nil) do
+  defp gen_route_plug_opts(app, name, security_data, nil) do
     req_validator_mod = Module.concat("Elixir", Util.gen_request_validator_name(app, name))
     res_validator_mod = Module.concat("Elixir", Util.gen_response_validator_name(app, name))
     fake_handler_mod = Module.concat("Elixir", Util.gen_fake_handler_name(app, name))
 
+    preprocessors = case Security.get_plug(security_data) do
+      nil -> [{req_validator_mod, []}]
+      security_plug -> [{security_plug, []}, {req_validator_mod, []}]
+    end
+
     [
-      preprocessors: [{req_validator_mod, []}],
+      preprocessors: preprocessors,
       handlers: [{fake_handler_mod, []}],
       postprocessors: [{res_validator_mod, []}]
     ]
   end
 
-  defp gen_route_plug_opts(_app, _name, data), do: data
+  defp gen_route_plug_opts(_app, _name, _security_data, data), do: data
+
+  defp save_config(config_file, data) do
+    config_data =
+      Enum.map(data, fn {name, _method, _uri, opts} ->
+        {name, opts[:preprocessors], opts[:handlers], opts[:postprocessors]}
+      end)
+
+    Config.save(config_file, config_data)
+  end
 end

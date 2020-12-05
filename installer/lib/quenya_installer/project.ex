@@ -34,14 +34,14 @@ defmodule QuenyaInstaller.Project do
     project_path = Path.expand(project_path)
     app = opts[:app] || Path.basename(project_path)
     app_mod = Module.concat([opts[:module] || Macro.camelize(app)])
-
+    jwt_secret = generate_secrets()
     %Project{
       base_path: project_path,
       app: app,
       app_mod: app_mod,
       root_app: app,
       root_mod: app_mod,
-      opts: opts
+      opts: Keyword.put(opts || [], :jwt_secret, jwt_secret)
     }
   end
 
@@ -61,5 +61,9 @@ defmodule QuenyaInstaller.Project do
     Regex.replace(Regex.recompile!(~r/:[a-zA-Z0-9_]+/), path, fn ":" <> key, _ ->
       project |> Map.fetch!(:"#{key}") |> to_string()
     end)
+  end
+
+  defp generate_secrets(length \\ 64) do
+    :crypto.strong_rand_bytes(length) |> Base.encode64(padding: false) |> binary_part(0, length)
   end
 end

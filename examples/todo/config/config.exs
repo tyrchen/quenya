@@ -25,6 +25,13 @@ config :logger, :console,
 config :todo,
   http: [port: 4000]
 
+# Joken configuration
+config :joken,
+  default_signer: {:system, "JWT_SECRET"},
+  # two weeks
+  default_exp: 2 * 7 * 24 * 60 * 60,
+  iss: "Todo Service"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -25,6 +25,13 @@ config :logger, :console,
 config :<%= @app_name %>,
   http: [port: 4000]
 
+# Joken configuration
+config :joken,
+  default_signer: "<%= @opts[:jwt_secret] %>"
+  # four weeks
+  default_exp: 4 * 7 * 24 * 60 * 60,
+  iss: "<%= @app_name %>"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -4,7 +4,7 @@ defmodule QuenyaBuilder do
   """
 
   alias Quenya.Parser
-  alias QuenyaBuilder.Router
+  alias QuenyaBuilder.Generator.Router
 
   @doc """
   Run quenya code generator

@@ -3,9 +3,9 @@ defmodule Quenya.Plug.RoutePlug do
   Plug for executing a route. To use it:
 
       get "/todo/:todoId", to: Quenya.Plug.RoutePlug, init_opts: [
-        preprocessors: [RequestValidatorPlug],
-        postprocessors: [ResponseValidatorPlug],
-        handlers: [RouteHandler]
+        preprocessors: [{RequestValidatorPlug, []}],
+        postprocessors: [{ResponseValidatorPlug, []}],
+        handlers: [{RouteHandler, []}]
       ])
 
   Note this plug shall be used after Plug.Parsers since it will access request body (if any)

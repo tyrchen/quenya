@@ -37,14 +37,15 @@ defmodule Quenya.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_json_schema, "~> 0.7"},
-      {:yaml_elixir, "~> 2.5"},
-      {:plug, "~>1.11"},
-      {:jason, "~> 1.2"},
-      {:uuid, "~> 1.0"},
       {:deep_merge, "~> 1.0"},
-      {:stream_data, "~> 0.5"},
+      {:ex_json_schema, "~> 0.7"},
+      {:jason, "~> 1.2"},
+      {:joken, "~> 2.0"},
       {:json_data_faker, "~> 0.2"},
+      {:plug, "~>1.11"},
+      {:stream_data, "~> 0.5"},
+      {:uuid, "~> 1.0"},
+      {:yaml_elixir, "~> 2.5"},
 
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},

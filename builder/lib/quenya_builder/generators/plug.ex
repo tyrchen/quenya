@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.Plug do
+defmodule QuenyaBuilder.Generator.Plug do
   @moduledoc """
   Generate method plug
   """

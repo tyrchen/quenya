@@ -5,20 +5,29 @@ defmodule QuenyaBuilder.Object do
 
   use TypedStruct
 
-  alias QuenyaBuilder.Object.{Parameter, Request, Response, Header, MediaType}
+  alias QuenyaBuilder.Object.{Parameter, Request, Response, Header, MediaType, SecurityScheme}
   alias ExJsonSchema.Schema
 
-  @allowed_param_position ["query", "path", "header", "cookie"]
+  # postion for params. Regular restful API shouldn't read/write cookies so we remove its support
+  @allowed_param_position ["query", "path", "header"]
+  # security scheme options. We only support `apiKey` and `http` for security scheme at the moment
+  @allowed_security_schema_type ["apiKey", "http"]
+  # Auth scheme options. We only support `bearer` for auth scheme when scheme type is http
+  @allowed_auth_scheme_type ["bearer"]
+  # bearer options. We only support `JWT` at the moment.
+  @allowed_bearer_type ["JWT"]
+  # We only support `simple` for param style
+  @allowed_param_style ["simple"]
 
   typedstruct module: Parameter do
     @typedoc "Parameter object from the spec"
     field :description, String.t(), default: ""
-    field :position, atom(), default: :query
+    field :position, String.t(), default: "query"
     field :name, String.t(), default: ""
     field :required, boolean(), default: false
     field :schema, ExJsonSchema.Schema.Root
     field :deprecated, boolean(), default: false
-    field :style, atom(), default: :simple
+    field :style, String.t(), default: "simple"
     field :explode, boolean(), default: false
     field :examples, list(map())
   end
@@ -50,9 +59,19 @@ defmodule QuenyaBuilder.Object do
     field :required, boolean(), default: false
     field :schema, ExJsonSchema.Schema.Root
     field :deprecated, boolean(), default: false
-    field :style, atom(), default: :simple
+    field :style, String.t(), default: "simple"
     field :explode, boolean(), default: false
     field :examples, list(map())
+  end
+
+  typedstruct module: SecurityScheme do
+    @typedoc "Security scheme from the spec, we only support apiKey at the moment"
+    field :type, String.t(), default: "apiKey"
+    field :description, String.t(), default: ""
+    field :name, String.t(), default: ""
+    field :position, String.t(), default: ""
+    field :scheme, String.t(), default: ""
+    field :bearerFormat, String.t(), default: ""
   end
 
   def gen_req_object(_id, nil), do: %Request{}
@@ -79,7 +98,7 @@ defmodule QuenyaBuilder.Object do
         required: p["required"] || false,
         schema: get_schema(id, "request parameters", name, p),
         deprecated: p["deprecated"] || false,
-        style: p["style"] || :simple,
+        style: ensure_param_style(p["style"] || "simple"),
         explode: p["explode"] || false,
         examples: get_examples(p)
       }
@@ -98,6 +117,13 @@ defmodule QuenyaBuilder.Object do
       }
 
       Map.put(res, code, response)
+    end)
+  end
+
+  def gen_security_schemes(data) do
+    Enum.reduce(data || %{}, %{}, fn {name, item}, acc ->
+      obj = gen_security_scheme_by_type(ensure_security_scheme_type(item["type"]), item)
+      Map.put(acc, name, obj)
     end)
   end
 
@@ -122,7 +148,7 @@ defmodule QuenyaBuilder.Object do
         required: v["required"] || false,
         schema: get_schema(id, "response headers", k, v),
         deprecated: v["deprecated"] || false,
-        style: v["style"] || :simple,
+        style: ensure_param_style(v["style"] || "simple"),
         explode: v["explode"] || false,
         examples: get_examples(v)
       }
@@ -131,10 +157,21 @@ defmodule QuenyaBuilder.Object do
     end)
   end
 
-  defp ensure_position(position) do
-    case position in @allowed_param_position do
-      true -> position
-      _ -> raise "Invalid position #{position}, expected: #{inspect(@allowed_param_position)}."
+  defp ensure_position(v), do: ensure_enum(v, @allowed_param_position, "position")
+
+  defp ensure_security_scheme_type(v),
+    do: ensure_enum(v, @allowed_security_schema_type, "security scheme type")
+
+  defp ensure_auth_scheme_type(v),
+    do: ensure_enum(v, @allowed_auth_scheme_type, "auth scheme type")
+
+  defp ensure_bearer_type(v), do: ensure_enum(v, @allowed_bearer_type, "bearer type")
+  defp ensure_param_style(v), do: ensure_enum(v, @allowed_param_style, "param style")
+
+  defp ensure_enum(v, choices, msg) do
+    case v in choices do
+      true -> v
+      _ -> raise "Unsupported #{msg} #{v}, expected: #{inspect(choices)}."
     end
   end
 
@@ -154,5 +191,24 @@ defmodule QuenyaBuilder.Object do
 
     # schema example is deprecated and is unnecessary for json schema validation
     Schema.resolve(Map.delete(schema, "example"))
+  end
+
+  defp gen_security_scheme_by_type("apiKey", item) do
+    %SecurityScheme{
+      type: "apiKey",
+      description: item["description"] || "",
+      name:
+        item["name"] || raise("name shall be defined for security scheme type #{item["type"]}"),
+      position: ensure_position(item["in"])
+    }
+  end
+
+  defp gen_security_scheme_by_type("http", item) do
+    %SecurityScheme{
+      type: "http",
+      description: item["description"] || "",
+      scheme: ensure_auth_scheme_type(item["scheme"] || "bearer"),
+      bearerFormat: ensure_bearer_type(item["bearerFormat"] || "JWT")
+    }
   end
 end

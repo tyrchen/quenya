@@ -26,6 +26,7 @@ defmodule TodoTest.Gen.ListTodos do
             |> conn(uri, Jason.encode!(data))
             |> put_req_header("content-type", type)
             |> put_req_header("accept", accept)
+            |> RequestHelper.put_security_scheme(security_data())
         end
 
       conn = Enum.reduce(req_headers, conn, fn {k, v}, acc -> put_req_header(acc, k, v) end)
@@ -85,7 +86,7 @@ defmodule TodoTest.Gen.ListTodos do
             "type" => "integer"
           }
         },
-        style: :simple
+        style: "simple"
       },
       %QuenyaBuilder.Object.Parameter{
         deprecated: false,
@@ -106,7 +107,7 @@ defmodule TodoTest.Gen.ListTodos do
             "type" => "string"
           }
         },
-        style: :simple
+        style: "simple"
       }
     ]
   end
@@ -159,7 +160,7 @@ defmodule TodoTest.Gen.ListTodos do
               refs: %{},
               schema: %{"type" => "string"}
             },
-            style: :simple
+            style: "simple"
           }
         }
       },
@@ -190,5 +191,9 @@ defmodule TodoTest.Gen.ListTodos do
 
   def router_mod do
     Todo.Gen.Router
+  end
+
+  def security_data do
+    nil
   end
 end

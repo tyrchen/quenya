@@ -3,6 +3,9 @@ defmodule Quenya.RequestHelper do
   Request helper functions
   """
 
+  alias Quenya.Token
+  alias Plug.Conn
+
   def validate_required(v, required?, position) do
     case {required?, v} do
       {true, nil} -> raise(Plug.BadRequestError, "#{v} does not exist in request #{position}")
@@ -49,6 +52,19 @@ defmodule Quenya.RequestHelper do
       result
     end)
   end
+
+  def put_security_scheme(conn, nil), do: conn
+
+  def put_security_scheme(conn, %{type: "http", scheme: "bearer", bearerFormat: "JWT"}) do
+    {token, _} = Token.create_access_token(%{id: 1})
+    conn |> Conn.put_req_header("authorization", token)
+  end
+
+  def put_security_scheme(_conn, %{type: "apiKey", name: _name, position: _position}) do
+    raise "Not implemented for apiKey"
+  end
+
+  def put_security_scheme(_conn, scheme), do: raise("Not supported scheme #{inspect(scheme)}")
 
   # private functions
   defp normalize_param(nil, _schema), do: nil

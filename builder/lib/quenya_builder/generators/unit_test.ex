@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.UnitTest do
+defmodule QuenyaBuilder.Generator.UnitTest do
   @moduledoc """
   Generate unit tests based on spec
   """
@@ -6,12 +6,13 @@ defmodule QuenyaBuilder.UnitTest do
   require DynamicModule
   alias QuenyaBuilder.Util
 
-  def gen(method, path, req, params, res, app, name, opts \\ []) do
+  def gen(method, path, data, app, name, opts \\ []) do
+    [req: req, params: params, res: res, security_data: security_data] = data
     mod_name = Util.gen_test_name(app, name)
 
     router_mod = Module.concat("Elixir", Util.gen_router_name(app))
     preamble = gen_preamble(router_mod)
-    contents = gen_tests(method, path, router_mod, req.content, params, res)
+    contents = gen_tests(method, path, router_mod, req.content, params, res, security_data)
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
   end
@@ -29,7 +30,7 @@ defmodule QuenyaBuilder.UnitTest do
     end
   end
 
-  defp gen_tests(method, path, router_mod, content, params, res) do
+  defp gen_tests(method, path, router_mod, content, params, res, security_data) do
     quote do
       property unquote(path) <> ": should work" do
         check all(
@@ -49,12 +50,14 @@ defmodule QuenyaBuilder.UnitTest do
                 |> conn(uri, Jason.encode!(data))
                 |> put_req_header("content-type", type)
                 |> put_req_header("accept", accept)
+                |> RequestHelper.put_security_scheme(security_data())
             end
 
           conn =
             Enum.reduce(req_headers, conn, fn {k, v}, acc ->
               put_req_header(acc, k, v)
             end)
+
 
           conn = apply(router_mod(), :call, [conn, @opts])
 
@@ -82,6 +85,7 @@ defmodule QuenyaBuilder.UnitTest do
       def params, do: unquote(params)
       def res, do: unquote(res)
       def router_mod, do: unquote(router_mod)
+      def security_data, do: unquote(security_data)
     end
   end
 end
