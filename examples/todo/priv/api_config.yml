@@ -1,0 +1,40 @@
+---
+deleteTodo:
+  preprocessors:
+    - Todo.Gen.DeleteTodo.RequestValidator: {}
+  handlers:
+    - Todo.Gen.DeleteTodo.FakeHandler: {}
+  postprocessors:
+    - Todo.Gen.DeleteTodo.ResponseValidator: {}
+
+getTodo:
+  preprocessors:
+    - Todo.Gen.GetTodo.RequestValidator: {}
+  handlers:
+    - Todo.Gen.GetTodo.FakeHandler: {}
+  postprocessors:
+    - Todo.Gen.GetTodo.ResponseValidator: {}
+
+updateTodo:
+  preprocessors:
+    - Todo.Gen.UpdateTodo.RequestValidator: {}
+  handlers:
+    - Todo.Gen.UpdateTodo.FakeHandler: {}
+  postprocessors:
+    - Todo.Gen.UpdateTodo.ResponseValidator: {}
+
+listTodos:
+  preprocessors:
+    - Todo.Gen.ListTodos.RequestValidator: {}
+  handlers:
+    - Todo.Gen.ListTodos.FakeHandler: {}
+  postprocessors:
+    - Todo.Gen.ListTodos.ResponseValidator: {}
+
+createTodo:
+  preprocessors:
+    - Todo.Gen.CreateTodo.RequestValidator: {}
+  handlers:
+    - Todo.Gen.CreateTodo.FakeHandler: {}
+  postprocessors:
+    - Todo.Gen.CreateTodo.ResponseValidator: {}

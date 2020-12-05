@@ -99,12 +99,6 @@ defmodule QuenyaBuilder.Util do
     ]
   end
 
-  def get_api_config(name) do
-    config = Application.get_all_env(:quenya)[:apis][name] || %{}
-
-    {config[:preprocessors] || [], config[:handlers] || [], config[:postprocessors] || []}
-  end
-
   def normalize_uri(uri) do
     # "/todo/{todoId}"
     uri

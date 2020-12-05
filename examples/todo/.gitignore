@@ -25,8 +25,3 @@ todo-*.tar
 # we ignore priv/static. You may want to comment
 # this depending on your deployment strategy.
 /priv/static/
-
-# Quenya generated code
-/gen
-/lib/gen
-/test/gen
