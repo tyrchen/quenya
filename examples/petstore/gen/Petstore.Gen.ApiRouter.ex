@@ -6,7 +6,12 @@ defmodule Petstore.Gen.ApiRouter do
   alias Quenya.Plug.{RoutePlug, MathAllPlug}
 
   plug :match
-  plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["application/json"],
+    json_decoder: Jason
+
   plug :dispatch
 
   def handle_errors(conn, %{kind: _kind, reason: %{message: msg}, stack: _stack}) do
@@ -26,7 +31,7 @@ defmodule Petstore.Gen.ApiRouter do
   post("/pet",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.AddPet.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.AddPet.RequestValidator, []}],
       handlers: [{Petstore.Gen.AddPet.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.AddPet.ResponseValidator, []}]
     ]
@@ -35,7 +40,7 @@ defmodule Petstore.Gen.ApiRouter do
   put("/pet",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.UpdatePet.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.UpdatePet.RequestValidator, []}],
       handlers: [{Petstore.Gen.UpdatePet.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.UpdatePet.ResponseValidator, []}]
     ]
@@ -44,7 +49,10 @@ defmodule Petstore.Gen.ApiRouter do
   get("/pet/findByStatus",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.FindPetsByStatus.RequestValidator, []}],
+      preprocessors: [
+        {Quenya.Plug.JwtPlug, []},
+        {Petstore.Gen.FindPetsByStatus.RequestValidator, []}
+      ],
       handlers: [{Petstore.Gen.FindPetsByStatus.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.FindPetsByStatus.ResponseValidator, []}]
     ]
@@ -53,7 +61,10 @@ defmodule Petstore.Gen.ApiRouter do
   get("/pet/findByTags",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.FindPetsByTags.RequestValidator, []}],
+      preprocessors: [
+        {Quenya.Plug.JwtPlug, []},
+        {Petstore.Gen.FindPetsByTags.RequestValidator, []}
+      ],
       handlers: [{Petstore.Gen.FindPetsByTags.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.FindPetsByTags.ResponseValidator, []}]
     ]
@@ -62,7 +73,7 @@ defmodule Petstore.Gen.ApiRouter do
   delete("/pet/:petId",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.DeletePet.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.DeletePet.RequestValidator, []}],
       handlers: [{Petstore.Gen.DeletePet.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.DeletePet.ResponseValidator, []}]
     ]
@@ -71,7 +82,7 @@ defmodule Petstore.Gen.ApiRouter do
   get("/pet/:petId",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.GetPetById.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.GetPetById.RequestValidator, []}],
       handlers: [{Petstore.Gen.GetPetById.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.GetPetById.ResponseValidator, []}]
     ]
@@ -80,7 +91,10 @@ defmodule Petstore.Gen.ApiRouter do
   post("/pet/:petId",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.UpdatePetWithForm.RequestValidator, []}],
+      preprocessors: [
+        {Quenya.Plug.JwtPlug, []},
+        {Petstore.Gen.UpdatePetWithForm.RequestValidator, []}
+      ],
       handlers: [{Petstore.Gen.UpdatePetWithForm.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.UpdatePetWithForm.ResponseValidator, []}]
     ]
@@ -89,7 +103,7 @@ defmodule Petstore.Gen.ApiRouter do
   post("/pet/:petId/uploadImage",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.UploadFile.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.UploadFile.RequestValidator, []}],
       handlers: [{Petstore.Gen.UploadFile.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.UploadFile.ResponseValidator, []}]
     ]
@@ -98,7 +112,7 @@ defmodule Petstore.Gen.ApiRouter do
   get("/store/inventory",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.GetInventory.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.GetInventory.RequestValidator, []}],
       handlers: [{Petstore.Gen.GetInventory.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.GetInventory.ResponseValidator, []}]
     ]
@@ -134,7 +148,7 @@ defmodule Petstore.Gen.ApiRouter do
   post("/user",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.CreateUser.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.CreateUser.RequestValidator, []}],
       handlers: [{Petstore.Gen.CreateUser.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.CreateUser.ResponseValidator, []}]
     ]
@@ -143,7 +157,10 @@ defmodule Petstore.Gen.ApiRouter do
   post("/user/createWithArray",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.CreateUsersWithArrayInput.RequestValidator, []}],
+      preprocessors: [
+        {Quenya.Plug.JwtPlug, []},
+        {Petstore.Gen.CreateUsersWithArrayInput.RequestValidator, []}
+      ],
       handlers: [{Petstore.Gen.CreateUsersWithArrayInput.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.CreateUsersWithArrayInput.ResponseValidator, []}]
     ]
@@ -152,7 +169,10 @@ defmodule Petstore.Gen.ApiRouter do
   post("/user/createWithList",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.CreateUsersWithListInput.RequestValidator, []}],
+      preprocessors: [
+        {Quenya.Plug.JwtPlug, []},
+        {Petstore.Gen.CreateUsersWithListInput.RequestValidator, []}
+      ],
       handlers: [{Petstore.Gen.CreateUsersWithListInput.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.CreateUsersWithListInput.ResponseValidator, []}]
     ]
@@ -170,7 +190,7 @@ defmodule Petstore.Gen.ApiRouter do
   get("/user/logout",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.LogoutUser.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.LogoutUser.RequestValidator, []}],
       handlers: [{Petstore.Gen.LogoutUser.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.LogoutUser.ResponseValidator, []}]
     ]
@@ -179,7 +199,7 @@ defmodule Petstore.Gen.ApiRouter do
   delete("/user/:username",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.DeleteUser.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.DeleteUser.RequestValidator, []}],
       handlers: [{Petstore.Gen.DeleteUser.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.DeleteUser.ResponseValidator, []}]
     ]
@@ -197,7 +217,7 @@ defmodule Petstore.Gen.ApiRouter do
   put("/user/:username",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Petstore.Gen.UpdateUser.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Petstore.Gen.UpdateUser.RequestValidator, []}],
       handlers: [{Petstore.Gen.UpdateUser.FakeHandler, []}],
       postprocessors: [{Petstore.Gen.UpdateUser.ResponseValidator, []}]
     ]

@@ -158,9 +158,8 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
       _, original, override when is_list(original) and is_list(override) ->
         case Keyword.keyword?(original) do
           true -> DeepMerge.continue_deep_merge()
-          _ -> (original ++ override) |> Enum.dedup_by(fn {x, _} -> x end)
+          _ ->  Enum.dedup_by((original ++ override), fn {x, _} -> x end)
         end
-        override
 
       _, _original, _override ->
         DeepMerge.continue_deep_merge()

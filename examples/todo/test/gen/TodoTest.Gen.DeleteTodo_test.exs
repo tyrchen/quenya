@@ -23,7 +23,7 @@ defmodule TodoTest.Gen.DeleteTodo do
 
           {type, data} ->
             method()
-            |> conn(uri, Jason.encode!(data))
+            |> conn(uri, ResponseHelper.encode(type, data))
             |> put_req_header("content-type", type)
             |> put_req_header("accept", accept)
         end

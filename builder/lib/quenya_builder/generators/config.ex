@@ -10,8 +10,7 @@ defmodule QuenyaBuilder.Generator.Config do
     handlers:<%= for {mod, opts} <- handlers do %>
       - <%= mod %>: <%= opts %><% end %>
     postprocessors:<%= for {mod, opts} <- postprocessors do %>
-      - <%= mod %>: <%= opts %><% end %>
-  <% end %>
+      - <%= mod %>: <%= opts %><% end %><% end %>
   """
 
   @doc """

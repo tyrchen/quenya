@@ -16,8 +16,12 @@ defmodule QuenyaBuilder.Object do
   @allowed_auth_scheme_type ["bearer"]
   # bearer options. We only support `JWT` at the moment.
   @allowed_bearer_type ["JWT"]
-  # We only support `simple` for param style
-  @allowed_param_style ["simple"]
+  # We only support `simple` for path
+  @allowed_path_param_style ["simple"]
+  # We only support `simple` for header
+  @allowed_header_param_style ["simple"]
+  # We only support `form` for query
+  @allowed_query_param_style ["form"]
 
   typedstruct module: Parameter do
     @typedoc "Parameter object from the spec"
@@ -91,14 +95,15 @@ defmodule QuenyaBuilder.Object do
       name =
         p["name"] || raise "Shall define name in the request parameters. data: #{inspect(data)}"
 
+      position = ensure_position(p["in"])
       %Parameter{
         description: p["description"] || "",
         name: name,
-        position: ensure_position(p["in"]),
+        position: position,
         required: p["required"] || false,
         schema: get_schema(id, "request parameters", name, p),
         deprecated: p["deprecated"] || false,
-        style: ensure_param_style(p["style"] || "simple"),
+        style: ensure_param_style(p["style"], position),
         explode: p["explode"] || false,
         examples: get_examples(p)
       }
@@ -148,7 +153,7 @@ defmodule QuenyaBuilder.Object do
         required: v["required"] || false,
         schema: get_schema(id, "response headers", k, v),
         deprecated: v["deprecated"] || false,
-        style: ensure_param_style(v["style"] || "simple"),
+        style: ensure_param_style(v["style"], "header"),
         explode: v["explode"] || false,
         examples: get_examples(v)
       }
@@ -166,7 +171,12 @@ defmodule QuenyaBuilder.Object do
     do: ensure_enum(v, @allowed_auth_scheme_type, "auth scheme type")
 
   defp ensure_bearer_type(v), do: ensure_enum(v, @allowed_bearer_type, "bearer type")
-  defp ensure_param_style(v), do: ensure_enum(v, @allowed_param_style, "param style")
+
+  defp ensure_param_style(nil, position) when position in ["header", "path"], do: "simple"
+  defp ensure_param_style(nil, position) when position in ["query", "cookie"], do: "form"
+  defp ensure_param_style(v, "header"), do: ensure_enum(v, @allowed_header_param_style, "header param style")
+  defp ensure_param_style(v, "path"), do: ensure_enum(v, @allowed_path_param_style, "path param style")
+  defp ensure_param_style(v, "query"), do: ensure_enum(v, @allowed_query_param_style, "query param style")
 
   defp ensure_enum(v, choices, msg) do
     case v in choices do
