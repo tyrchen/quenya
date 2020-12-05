@@ -34,4 +34,22 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+      - name: quenya deps cache
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-quenya-${{ hashFiles('mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya-
+      - name: quenya installer deps cache
+        uses: actions/cache@v2
+        with:
+          path: installer/deps
+          key: ${{ runner.os }}-quenya-installer-${{ hashFiles('installer/mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya-installer-
+      - name: quenya builder deps cache
+        uses: actions/cache@v2
+        with:
+          path: builder/deps
+          key: ${{ runner.os }}-quenya-builder-${{ hashFiles('builder/mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya-builder-
       - run: make test-all
