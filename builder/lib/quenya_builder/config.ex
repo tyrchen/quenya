@@ -47,6 +47,7 @@ defmodule QuenyaBuilder.Config do
   defp normalize_opts(data) do
     Enum.map(data, fn item ->
       Enum.map(item, fn {mod, opts} ->
+        mod = Module.concat("Elixir", mod)
         opts = Enum.map(opts, fn {k, v} -> {String.to_atom(k), v} end)
         {mod, opts}
       end)
