@@ -7,7 +7,6 @@ addPet:
     - Petstore.Gen.AddPet.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.AddPet.ResponseValidator: {}
-
 updatePet:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -16,7 +15,6 @@ updatePet:
     - Petstore.Gen.UpdatePet.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.UpdatePet.ResponseValidator: {}
-
 findPetsByStatus:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -25,7 +23,6 @@ findPetsByStatus:
     - Petstore.Gen.FindPetsByStatus.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.FindPetsByStatus.ResponseValidator: {}
-
 findPetsByTags:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -34,7 +31,6 @@ findPetsByTags:
     - Petstore.Gen.FindPetsByTags.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.FindPetsByTags.ResponseValidator: {}
-
 deletePet:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -43,7 +39,6 @@ deletePet:
     - Petstore.Gen.DeletePet.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.DeletePet.ResponseValidator: {}
-
 getPetById:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -52,7 +47,6 @@ getPetById:
     - Petstore.Gen.GetPetById.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.GetPetById.ResponseValidator: {}
-
 updatePetWithForm:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -61,7 +55,6 @@ updatePetWithForm:
     - Petstore.Gen.UpdatePetWithForm.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.UpdatePetWithForm.ResponseValidator: {}
-
 uploadFile:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -70,7 +63,6 @@ uploadFile:
     - Petstore.Gen.UploadFile.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.UploadFile.ResponseValidator: {}
-
 getInventory:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -79,7 +71,6 @@ getInventory:
     - Petstore.Gen.GetInventory.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.GetInventory.ResponseValidator: {}
-
 placeOrder:
   preprocessors:
     - Petstore.Gen.PlaceOrder.RequestValidator: {}
@@ -87,7 +78,6 @@ placeOrder:
     - Petstore.Gen.PlaceOrder.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.PlaceOrder.ResponseValidator: {}
-
 deleteOrder:
   preprocessors:
     - Petstore.Gen.DeleteOrder.RequestValidator: {}
@@ -95,7 +85,6 @@ deleteOrder:
     - Petstore.Gen.DeleteOrder.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.DeleteOrder.ResponseValidator: {}
-
 getOrderById:
   preprocessors:
     - Petstore.Gen.GetOrderById.RequestValidator: {}
@@ -103,7 +92,6 @@ getOrderById:
     - Petstore.Gen.GetOrderById.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.GetOrderById.ResponseValidator: {}
-
 createUser:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -112,7 +100,6 @@ createUser:
     - Petstore.Gen.CreateUser.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.CreateUser.ResponseValidator: {}
-
 createUsersWithArrayInput:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -121,7 +108,6 @@ createUsersWithArrayInput:
     - Petstore.Gen.CreateUsersWithArrayInput.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.CreateUsersWithArrayInput.ResponseValidator: {}
-
 createUsersWithListInput:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -130,7 +116,6 @@ createUsersWithListInput:
     - Petstore.Gen.CreateUsersWithListInput.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.CreateUsersWithListInput.ResponseValidator: {}
-
 loginUser:
   preprocessors:
     - Petstore.Gen.LoginUser.RequestValidator: {}
@@ -138,7 +123,6 @@ loginUser:
     - Petstore.Gen.LoginUser.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.LoginUser.ResponseValidator: {}
-
 logoutUser:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -147,7 +131,6 @@ logoutUser:
     - Petstore.Gen.LogoutUser.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.LogoutUser.ResponseValidator: {}
-
 deleteUser:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
@@ -156,7 +139,6 @@ deleteUser:
     - Petstore.Gen.DeleteUser.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.DeleteUser.ResponseValidator: {}
-
 getUserByName:
   preprocessors:
     - Petstore.Gen.GetUserByName.RequestValidator: {}
@@ -164,7 +146,6 @@ getUserByName:
     - Petstore.Gen.GetUserByName.FakeHandler: {}
   postprocessors:
     - Petstore.Gen.GetUserByName.ResponseValidator: {}
-
 updateUser:
   preprocessors:
     - Quenya.Plug.JwtPlug: {}
