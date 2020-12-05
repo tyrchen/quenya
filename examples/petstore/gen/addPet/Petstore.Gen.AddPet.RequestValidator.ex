@@ -8,7 +8,7 @@ defmodule Petstore.Gen.AddPet.RequestValidator do
   end
 
   def call(conn, _opts) do
-    context = %{}
+    context = conn.assigns[:request_context] || %{}
 
     content_type = Quenya.RequestHelper.get_content_type(conn, "header")
     schemas = get_body_schemas()

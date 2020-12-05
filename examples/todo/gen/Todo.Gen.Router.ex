@@ -8,7 +8,12 @@ defmodule Todo.Gen.Router do
   plug Plug.Static, at: "/public", from: {:quenya, "priv/swagger"}
 
   plug :match
-  plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["application/json"],
+    json_decoder: Jason
+
   plug :dispatch
 
   def handle_errors(conn, %{kind: _kind, reason: %{message: msg}, stack: _stack}) do

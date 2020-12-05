@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.Config do
+defmodule QuenyaBuilder.Generator.Config do
   @moduledoc """
   Load and save quenya configuration
   """
@@ -10,8 +10,7 @@ defmodule QuenyaBuilder.Config do
     handlers:<%= for {mod, opts} <- handlers do %>
       - <%= mod %>: <%= opts %><% end %>
     postprocessors:<%= for {mod, opts} <- postprocessors do %>
-      - <%= mod %>: <%= opts %><% end %>
-  <% end %>
+      - <%= mod %>: <%= opts %><% end %><% end %>
   """
 
   @doc """
@@ -39,7 +38,11 @@ defmodule QuenyaBuilder.Config do
   Save configuration to priv_api_config.yml if the file not exists
   """
   def save(filename, data) do
-    data = Enum.map(data, fn {name, pre, h, post} -> {name, denormalize_opts(pre), denormalize_opts(h), denormalize_opts(post)} end)
+    data =
+      Enum.map(data, fn {name, pre, h, post} ->
+        {name, denormalize_opts(pre), denormalize_opts(h), denormalize_opts(post)}
+      end)
+
     content = EEx.eval_string(@template, data: data)
     File.write!(filename, content)
   end
@@ -53,7 +56,6 @@ defmodule QuenyaBuilder.Config do
       end)
     end)
     |> List.flatten()
-
   end
 
   defp denormalize_opts(data) do

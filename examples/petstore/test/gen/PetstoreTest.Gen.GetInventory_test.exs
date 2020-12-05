@@ -23,12 +23,13 @@ defmodule PetstoreTest.Gen.GetInventory do
 
           {type, data} ->
             method()
-            |> conn(uri, Jason.encode!(data))
+            |> conn(uri, ResponseHelper.encode(type, data))
             |> put_req_header("content-type", type)
             |> put_req_header("accept", accept)
         end
 
       conn = Enum.reduce(req_headers, conn, fn {k, v}, acc -> put_req_header(acc, k, v) end)
+      conn = conn |> RequestHelper.put_security_scheme(security_data())
       conn = apply(router_mod(), :call, [conn, @opts])
       assert(conn.status == code)
 
@@ -93,5 +94,16 @@ defmodule PetstoreTest.Gen.GetInventory do
 
   def router_mod do
     Petstore.Gen.Router
+  end
+
+  def security_data do
+    {%QuenyaBuilder.Object.SecurityScheme{
+       bearerFormat: "JWT",
+       description: "",
+       name: "",
+       position: "",
+       scheme: "bearer",
+       type: "http"
+     }, []}
   end
 end

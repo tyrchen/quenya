@@ -1,12 +1,12 @@
 ---
 deleteTodo:
   preprocessors:
+    - Quenya.Plug.JwtPlug: {}
     - Todo.Gen.DeleteTodo.RequestValidator: {}
   handlers:
     - Todo.Gen.DeleteTodo.FakeHandler: {}
   postprocessors:
     - Todo.Gen.DeleteTodo.ResponseValidator: {}
-
 getTodo:
   preprocessors:
     - Todo.Gen.GetTodo.RequestValidator: {}
@@ -14,15 +14,14 @@ getTodo:
     - Todo.Gen.GetTodo.FakeHandler: {}
   postprocessors:
     - Todo.Gen.GetTodo.ResponseValidator: {}
-
 updateTodo:
   preprocessors:
+    - Quenya.Plug.JwtPlug: {}
     - Todo.Gen.UpdateTodo.RequestValidator: {}
   handlers:
     - Todo.Gen.UpdateTodo.FakeHandler: {}
   postprocessors:
     - Todo.Gen.UpdateTodo.ResponseValidator: {}
-
 listTodos:
   preprocessors:
     - Todo.Gen.ListTodos.RequestValidator: {}
@@ -30,9 +29,9 @@ listTodos:
     - Todo.Gen.ListTodos.FakeHandler: {}
   postprocessors:
     - Todo.Gen.ListTodos.ResponseValidator: {}
-
 createTodo:
   preprocessors:
+    - Quenya.Plug.JwtPlug: {}
     - Todo.Gen.CreateTodo.RequestValidator: {}
   handlers:
     - Todo.Gen.CreateTodo.FakeHandler: {}

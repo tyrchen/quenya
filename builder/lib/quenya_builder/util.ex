@@ -72,15 +72,13 @@ defmodule QuenyaBuilder.Util do
   def gen_router_preamble do
     [
       quote do
-        plug(:match)
+        plug :match
 
-        plug(Plug.Parsers,
-          parsers: [:json],
+        plug Plug.Parsers, parsers: [:urlencoded, :multipart, :json],
           pass: ["application/json"],
           json_decoder: Jason
-        )
 
-        plug(:dispatch)
+        plug :dispatch
 
         def handle_errors(conn, %{kind: _kind, reason: %{message: msg}, stack: _stack}) do
           Plug.Conn.send_resp(conn, conn.status, msg)

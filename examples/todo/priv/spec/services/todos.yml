@@ -15,6 +15,8 @@ post:
   operationId: createTodo
   tags: [todos]
   description: create a new todo item
+  security:
+    - token: []
   requestBody:
     description: todo item to be posted
     required: true

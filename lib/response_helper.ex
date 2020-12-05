@@ -4,12 +4,15 @@ defmodule Quenya.ResponseHelper do
   """
 
   def decode("application/json", body), do: Jason.decode!(body)
+  def decode("application/x-www-form-urlencoded", body), do: URI.decode_query(body)
   def decode("*/*", body), do: body
 
   def decode(content_type, _body),
     do: raise("Content type #{inspect(content_type)} not supported")
 
   def encode("application/json", data), do: Jason.encode!(data)
+  def encode("application/x-www-form-urlencoded", data), do: URI.encode_query(data)
+  def encode("multipart/form-data", data), do: URI.encode_query(data)
 
   def encode(content_type, _data),
     do: raise(Plug.BadRequestError, "Content type #{inspect(content_type)} not supported")

@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.FakeHandler do
+defmodule QuenyaBuilder.Generator.FakeHandler do
   @moduledoc """
   Generate fake handler for response
   """

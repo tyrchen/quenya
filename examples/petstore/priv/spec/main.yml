@@ -35,9 +35,7 @@ paths:
         "405":
           description: Invalid input
       security:
-        - petstore_auth:
-            - "write:pets"
-            - "read:pets"
+        - token: []
       requestBody:
         $ref: "#/components/requestBodies/Pet"
     put:
@@ -60,9 +58,7 @@ paths:
         "405":
           description: Validation exception
       security:
-        - petstore_auth:
-            - "write:pets"
-            - "read:pets"
+        - token: []
       requestBody:
         $ref: "#/components/requestBodies/Pet"
   /pet/findByStatus:
@@ -100,8 +96,7 @@ paths:
         "400":
           description: Invalid status value
       security:
-        - petstore_auth:
-            - "read:pets"
+        - token: []
   /pet/findByTags:
     get:
       tags:
@@ -134,8 +129,7 @@ paths:
         "400":
           description: Invalid tag value
       security:
-        - petstore_auth:
-            - "read:pets"
+        - token: []
       deprecated: true
   "/pet/{petId}":
     get:
@@ -164,7 +158,7 @@ paths:
         "404":
           description: Pet not found
       security:
-        - api_key: []
+        - token: []
     post:
       tags:
         - pet
@@ -185,9 +179,7 @@ paths:
         "405":
           description: Invalid input
       security:
-        - petstore_auth:
-            - "write:pets"
-            - "read:pets"
+        - token: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -207,11 +199,6 @@ paths:
       description: ""
       operationId: deletePet
       parameters:
-        - name: api_key
-          in: header
-          required: false
-          schema:
-            type: string
         - name: petId
           in: path
           description: Pet id to delete
@@ -225,9 +212,7 @@ paths:
         "400":
           description: Invalid pet value
       security:
-        - petstore_auth:
-            - "write:pets"
-            - "read:pets"
+        - token: []
   "/pet/{petId}/uploadImage":
     post:
       tags:
@@ -251,9 +236,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
       security:
-        - petstore_auth:
-            - "write:pets"
-            - "read:pets"
+        - token: []
       requestBody:
         content:
           multipart/form-data:
@@ -285,7 +268,7 @@ paths:
                   type: integer
                   format: int32
       security:
-        - api_key: []
+        - token: []
   /store/order:
     post:
       tags:
@@ -372,7 +355,7 @@ paths:
         "201":
           description: successful operation
       security:
-        - api_key: []
+        - token: []
       requestBody:
         content:
           application/json:
@@ -391,7 +374,7 @@ paths:
         "201":
           description: successful operation
       security:
-        - api_key: []
+        - token: []
       requestBody:
         $ref: "#/components/requestBodies/UserArray"
   /user/createWithList:
@@ -405,7 +388,7 @@ paths:
         "201":
           description: successful operation
       security:
-        - api_key: []
+        - token: []
       requestBody:
         $ref: "#/components/requestBodies/UserArray"
   /user/login:
@@ -467,7 +450,7 @@ paths:
         "204":
           description: successful operation
       security:
-        - api_key: []
+        - token: []
   "/user/{username}":
     get:
       tags:
@@ -512,7 +495,7 @@ paths:
         "404":
           description: User not found
       security:
-        - api_key: []
+        - token: []
       requestBody:
         content:
           application/json:
@@ -539,7 +522,7 @@ paths:
         "404":
           description: User not found
       security:
-        - api_key: []
+        - token: []
 externalDocs:
   description: Find out more about Swagger
   url: "http://swagger.io"
@@ -562,18 +545,22 @@ components:
       description: Pet object that needs to be added to the store
       required: true
   securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: "http://petstore.swagger.io/api/oauth/dialog"
-          scopes:
-            "write:pets": modify pets in your account
-            "read:pets": read your pets
+    # petstore_auth:
+    #   type: oauth2
+    #   flows:
+    #     implicit:
+    #       authorizationUrl: "http://petstore.swagger.io/api/oauth/dialog"
+    #       scopes:
+    #         "write:pets": modify pets in your account
+    #         "read:pets": read your pets
     api_key:
       type: apiKey
       name: api_key
       in: header
+    token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Order:
       title: Pet Order

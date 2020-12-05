@@ -8,7 +8,7 @@ defmodule Petstore.Gen.LogoutUser.RequestValidator do
   end
 
   def call(conn, _opts) do
-    context = %{}
+    context = conn.assigns[:request_context] || %{}
 
     assign(conn, :request_context, context)
   end

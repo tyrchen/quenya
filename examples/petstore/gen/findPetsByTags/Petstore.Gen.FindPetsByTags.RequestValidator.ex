@@ -8,7 +8,7 @@ defmodule Petstore.Gen.FindPetsByTags.RequestValidator do
   end
 
   def call(conn, _opts) do
-    context = %{}
+    context = conn.assigns[:request_context] || %{}
     data = get_params()
 
     context =

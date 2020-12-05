@@ -10,8 +10,7 @@ import Config
 # Configures quenya API pipelines
 config :quenya,
   use_fake_handler: true,
-  use_response_validator: true,
-  apis: %{}
+  use_response_validator: true
 
 # Configures ex_json_schema to use Quenya.FormatValidator for unkown format
 config :ex_json_schema, :custom_format_validator, {Quenya.FormatValidator, :validate}
@@ -24,6 +23,13 @@ config :logger, :console,
 # Configures application server port
 config :todo,
   http: [port: 4000]
+
+# Joken configuration
+config :joken,
+  default_signer: {:system, "JWT_SECRET"},
+  # two weeks
+  default_exp: 2 * 7 * 24 * 60 * 60,
+  iss: "Todo Service"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

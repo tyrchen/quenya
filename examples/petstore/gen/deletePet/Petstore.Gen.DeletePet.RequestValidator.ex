@@ -8,7 +8,7 @@ defmodule Petstore.Gen.DeletePet.RequestValidator do
   end
 
   def call(conn, _opts) do
-    context = %{}
+    context = conn.assigns[:request_context] || %{}
     data = get_params()
 
     context =
@@ -35,13 +35,6 @@ defmodule Petstore.Gen.DeletePet.RequestValidator do
 
   def get_params do
     [
-      {"api_key", "header", false,
-       %ExJsonSchema.Schema.Root{
-         custom_format_validator: nil,
-         location: :root,
-         refs: %{},
-         schema: %{"type" => "string"}
-       }},
       {"petId", "path", true,
        %ExJsonSchema.Schema.Root{
          custom_format_validator: nil,

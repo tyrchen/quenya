@@ -1,4 +1,4 @@
-defmodule QuenyaBuilder.RequestValidator do
+defmodule QuenyaBuilder.Generator.RequestValidator do
   @moduledoc """
   Build request validator module
   """
@@ -37,7 +37,7 @@ defmodule QuenyaBuilder.RequestValidator do
     contents =
       quote do
         def call(conn, _opts) do
-          context = %{}
+          context = conn.assigns[:request_context] || %{}
           unquote(param_validator)
           unquote(body_validator)
           assign(conn, :request_context, context)

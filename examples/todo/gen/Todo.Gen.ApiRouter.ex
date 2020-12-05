@@ -6,7 +6,12 @@ defmodule Todo.Gen.ApiRouter do
   alias Quenya.Plug.{RoutePlug, MathAllPlug}
 
   plug :match
-  plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["application/json"],
+    json_decoder: Jason
+
   plug :dispatch
 
   def handle_errors(conn, %{kind: _kind, reason: %{message: msg}, stack: _stack}) do
@@ -26,7 +31,7 @@ defmodule Todo.Gen.ApiRouter do
   delete("/todo/:todoId",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Todo.Gen.DeleteTodo.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Todo.Gen.DeleteTodo.RequestValidator, []}],
       handlers: [{Todo.Gen.DeleteTodo.FakeHandler, []}],
       postprocessors: [{Todo.Gen.DeleteTodo.ResponseValidator, []}]
     ]
@@ -44,7 +49,7 @@ defmodule Todo.Gen.ApiRouter do
   patch("/todo/:todoId",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Todo.Gen.UpdateTodo.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Todo.Gen.UpdateTodo.RequestValidator, []}],
       handlers: [{Todo.Gen.UpdateTodo.FakeHandler, []}],
       postprocessors: [{Todo.Gen.UpdateTodo.ResponseValidator, []}]
     ]
@@ -62,7 +67,7 @@ defmodule Todo.Gen.ApiRouter do
   post("/todos",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Todo.Gen.CreateTodo.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Todo.Gen.CreateTodo.RequestValidator, []}],
       handlers: [{Todo.Gen.CreateTodo.FakeHandler, []}],
       postprocessors: [{Todo.Gen.CreateTodo.ResponseValidator, []}]
     ]
