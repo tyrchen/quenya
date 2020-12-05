@@ -21,6 +21,8 @@ delete:
   operationId: deleteTodo
   tags: [todo]
   description: delete a todo item
+  security:
+    - token: []
   parameters:
     - name: todoId
       in: path
@@ -37,6 +39,8 @@ patch:
   operationId: updateTodo
   tags: [todo]
   description: update todo status
+  security:
+    - token: []
   parameters:
     - name: todoId
       in: path
