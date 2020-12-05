@@ -21,6 +21,8 @@ delete:
   operationId: deleteTodo
   tags: [todo]
   description: delete a todo item
+  security:
+    - token: []
   parameters:
     - name: todoId
       in: path

@@ -55,16 +55,17 @@ defmodule Quenya.RequestHelper do
 
   def put_security_scheme(conn, nil), do: conn
 
-  def put_security_scheme(conn, %{type: "http", scheme: "bearer", bearerFormat: "JWT"}) do
+  def put_security_scheme(conn, {%{type: "http", scheme: "bearer", bearerFormat: "JWT"}, _opts}) do
     {token, _} = Token.create_access_token(%{id: 1})
-    conn |> Conn.put_req_header("authorization", token)
+    conn |> Conn.put_req_header("authorization", "Bearer #{token}")
   end
 
-  def put_security_scheme(_conn, %{type: "apiKey", name: _name, position: _position}) do
+  def put_security_scheme(_conn, {%{type: "apiKey", name: _name, position: _position}, _opts}) do
     raise "Not implemented for apiKey"
   end
 
-  def put_security_scheme(_conn, scheme), do: raise("Not supported scheme #{inspect(scheme)}")
+  def put_security_scheme(_conn, {scheme, _opts}),
+    do: raise("Not supported scheme #{inspect(scheme)}")
 
   # private functions
   defp normalize_param(nil, _schema), do: nil

@@ -26,7 +26,7 @@ defmodule Todo.Gen.ApiRouter do
   delete("/todo/:todoId",
     to: RoutePlug,
     init_opts: [
-      preprocessors: [{Todo.Gen.DeleteTodo.RequestValidator, []}],
+      preprocessors: [{Quenya.Plug.JwtPlug, []}, {Todo.Gen.DeleteTodo.RequestValidator, []}],
       handlers: [{Todo.Gen.DeleteTodo.FakeHandler, []}],
       postprocessors: [{Todo.Gen.DeleteTodo.ResponseValidator, []}]
     ]

@@ -1,6 +1,7 @@
 ---
 deleteTodo:
   preprocessors:
+    - Quenya.Plug.JwtPlug: {}
     - Todo.Gen.DeleteTodo.RequestValidator: {}
   handlers:
     - Todo.Gen.DeleteTodo.FakeHandler: {}

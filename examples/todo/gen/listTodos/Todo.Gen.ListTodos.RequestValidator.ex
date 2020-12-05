@@ -8,7 +8,7 @@ defmodule Todo.Gen.ListTodos.RequestValidator do
   end
 
   def call(conn, _opts) do
-    context = conn.assigns[:request_context]
+    context = conn.assigns[:request_context] || %{}
     data = get_params()
 
     context =

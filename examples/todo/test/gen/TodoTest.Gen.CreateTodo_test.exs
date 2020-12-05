@@ -26,10 +26,10 @@ defmodule TodoTest.Gen.CreateTodo do
             |> conn(uri, Jason.encode!(data))
             |> put_req_header("content-type", type)
             |> put_req_header("accept", accept)
-            |> RequestHelper.put_security_scheme(security_data())
         end
 
       conn = Enum.reduce(req_headers, conn, fn {k, v}, acc -> put_req_header(acc, k, v) end)
+      conn = conn |> RequestHelper.put_security_scheme(security_data())
       conn = apply(router_mod(), :call, [conn, @opts])
       assert(conn.status == code)
 
