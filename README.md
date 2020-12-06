@@ -18,7 +18,7 @@ Quenya will also generate property testing, it will use `Plug.Test` and `StreamD
 
 Quenya will also provide a set of modules, plugs, test helpers to help you build REST APIs easily.
 
-## How to use Quenya?
+## How to use Quenya
 
 ### Install CLI
 
@@ -138,13 +138,11 @@ Quenya generates property tests for all your API endpoints based on OAPI spec, s
 $ mix test
 Compiling 42 files (.ex)
 Generated petstore app
-............FF......
+....................
 
 Finished in 2.7 seconds
 20 properties, 2 failures
 ```
-
-Don't worry too much about two failed cases, Quenya is still early so certain content negotiation type is not supported yet. We will support that soon!
 
 Note these tests covers all success cases. In future, we will try to cover all failed cases in Quenya.
 
@@ -157,24 +155,14 @@ $ tokei gen test
 -------------------------------------------------------------------------------
  Language            Files        Lines         Code     Comments       Blanks
 -------------------------------------------------------------------------------
- Elixir                 63         5138         4573            0          565
+ Elixir                 83         8152         7060            0         1092
 -------------------------------------------------------------------------------
- Total                  63         5138         4573            0          565
+ Total                  83         8152         7060            0         1092
 -------------------------------------------------------------------------------
 ```
 
-That's 4.5k LoC for the petstore spec. The more APIs you defined, the more Quenya will do for you. Once we have most of the parts of Quenya built, this number will be much bigger.
+That's 8k LoC for the petstore spec. The more APIs you defined, the more Quenya will do for you. Once we have most of the parts of Quenya built, this number will be much bigger.
 
-Now try edit config:
-
-```elixir
-config :quenya,
-  use_fake_handler: true,
-  use_response_validator: true, # change this to true
-  apis: %{}
-```
-
-Rerun tokei, you'll get 6k LoC.
 ### What's under the hood?
 
 Now you have a basic feeling on what's going on. By default, Quenya will generate an API router based on API spec, with a convenient swagger UI. For each route defined in the spec, Quenya will generate a Plug for it. And a Plug is a pipeline which will execute in this order:
@@ -275,6 +263,8 @@ When a `PUT /user/:username` request kicks in, it will be handled by `Quenya.Plu
 
 ## Why Quenya?
 
+I've given a topic [Building next-gen APIs](docs/building-next-gen-apis.pdf) in 10/2020. The original idea is: why don't I build a code generator to generate API code that we don't need to write repeatedly? I always hold this tenet that everything could be generated should be generated.
+
 Building a high-quality HTTP API app is non-trivial. Good APIs have these traits:
 
 For API users:
@@ -299,21 +289,4 @@ Quenya tries to help you start with the API spec, iterate it without writing the
 
 ## Why not GraphQL or other solutions?
 
-I've used GraphQL in many projects, I even built a tool called [goldorin](https://hex.pm/packages/goldorin) to generate Absinthe/Ecto code from a homebrewed spec language called `goldorin`. GraphQL has its advantages like:
-
-- Easy to use (GraphQL playground is even greater than swagger!)
-- Flexible query makes clients easy to get the right amount of data it needs
-- Save client API requests round trips Subscription is great for building event driven apps
-- A good aggregate layer to micro services Apollo toolchain is pretty decent
-- Good ecosystem (e.g. AWS AppSync support it)
-
-But it also has many drawbacks, which is more serious than its advantages:
-
-- A big learning curve for both client and server devs
-- Breaks general HTTP ecosystem
-      - Every request is a POST (breaks caching)
-      - Every response is 200 (breaks the HTTP semantics)
-      - All APIs inside a schema point to the same API location (breaks URI based routing, and monitoring ecosystem)
-- Complexity of a query sometimes pretty tricky
-- N + 1 problem (dataloader fixed part of the issue)
-- Need extra work for logging, monitoring, caching, etc. (a big headache)
+See the above slides and you'll see why.
