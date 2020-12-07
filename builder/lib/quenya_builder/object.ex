@@ -96,6 +96,7 @@ defmodule QuenyaBuilder.Object do
         p["name"] || raise "Shall define name in the request parameters. data: #{inspect(data)}"
 
       position = ensure_position(p["in"])
+
       %Parameter{
         description: p["description"] || "",
         name: name,
@@ -174,9 +175,15 @@ defmodule QuenyaBuilder.Object do
 
   defp ensure_param_style(nil, position) when position in ["header", "path"], do: "simple"
   defp ensure_param_style(nil, position) when position in ["query", "cookie"], do: "form"
-  defp ensure_param_style(v, "header"), do: ensure_enum(v, @allowed_header_param_style, "header param style")
-  defp ensure_param_style(v, "path"), do: ensure_enum(v, @allowed_path_param_style, "path param style")
-  defp ensure_param_style(v, "query"), do: ensure_enum(v, @allowed_query_param_style, "query param style")
+
+  defp ensure_param_style(v, "header"),
+    do: ensure_enum(v, @allowed_header_param_style, "header param style")
+
+  defp ensure_param_style(v, "path"),
+    do: ensure_enum(v, @allowed_path_param_style, "path param style")
+
+  defp ensure_param_style(v, "query"),
+    do: ensure_enum(v, @allowed_query_param_style, "query param style")
 
   defp ensure_enum(v, choices, msg) do
     case v in choices do

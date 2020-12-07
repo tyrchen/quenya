@@ -106,13 +106,29 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
       new_mod_opts = Keyword.update!(mod_opts, :path, &Path.join(&1, name))
       RequestValidator.gen(req, params, app, name, new_mod_opts)
 
-      if Application.get_env(:quenya, :use_response_validator, true) do
-        ResponseValidator.gen(res, app, name, new_mod_opts)
-      end
+      preprocessors = get_preprocessors(app, name, security_data)
+      handlers = []
+      postprocessors = []
 
-      if Application.get_env(:quenya, :use_fake_handler, true) do
-        FakeHandler.gen(res, app, name, new_mod_opts)
-      end
+      postprocessors =
+        case Application.get_env(:quenya, :use_response_validator, true) do
+          true ->
+            ResponseValidator.gen(res, app, name, new_mod_opts)
+            get_post_processors(app, name)
+
+          _ ->
+            postprocessors
+        end
+
+      handlers =
+        case Application.get_env(:quenya, :use_fake_handler, true) do
+          true ->
+            FakeHandler.gen(res, app, name, new_mod_opts)
+            get_handlers(app, name)
+
+          _ ->
+            handlers
+        end
 
       ut_mod_opts =
         new_mod_opts
@@ -124,32 +140,41 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
         UnitTest.gen(method, Path.join(base_path, uri), data, app, name, ut_mod_opts)
       end
 
-      init_opts = gen_route_plug_opts(app, name, security_data, config[name])
+      init_opts = gen_route_plug_opts(preprocessors, handlers, postprocessors, config[name])
       uri = Util.normalize_uri(uri)
       {name, method, uri, init_opts}
     end)
   end
 
-  defp gen_route_plug_opts(app, name, security_data, nil) do
+  defp get_preprocessors(app, name, security_data) do
     req_validator_mod = Module.concat("Elixir", Util.gen_request_validator_name(app, name))
+
+    case Security.get_plug(security_data) do
+      nil -> [{req_validator_mod, []}]
+      security_plug -> [{security_plug, []}, {req_validator_mod, []}]
+    end
+  end
+
+  defp get_post_processors(app, name) do
     res_validator_mod = Module.concat("Elixir", Util.gen_response_validator_name(app, name))
+    [{res_validator_mod, []}]
+  end
+
+  defp get_handlers(app, name) do
     fake_handler_mod = Module.concat("Elixir", Util.gen_fake_handler_name(app, name))
+    [{fake_handler_mod, []}]
+  end
 
-    preprocessors =
-      case Security.get_plug(security_data) do
-        nil -> [{req_validator_mod, []}]
-        security_plug -> [{security_plug, []}, {req_validator_mod, []}]
-      end
-
+  defp gen_route_plug_opts(preprocessors, handlers, postprocessors, nil) do
     [
       preprocessors: preprocessors,
-      handlers: [{fake_handler_mod, []}],
-      postprocessors: [{res_validator_mod, []}]
+      handlers: handlers,
+      postprocessors: postprocessors
     ]
   end
 
-  defp gen_route_plug_opts(app, name, security_data, data) do
-    data_from_spec = gen_route_plug_opts(app, name, security_data, nil)
+  defp gen_route_plug_opts(preprocessors, handlers, postprocessors, data) do
+    data_from_spec = gen_route_plug_opts(preprocessors, handlers, postprocessors, nil)
 
     # we want to preserve user modified config, while still pickup the changes from
     # the OpenAPI spec. say, user added new security config in an existing operation,
@@ -158,7 +183,7 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
       _, original, override when is_list(original) and is_list(override) ->
         case Keyword.keyword?(original) do
           true -> DeepMerge.continue_deep_merge()
-          _ ->  Enum.dedup_by((original ++ override), fn {x, _} -> x end)
+          _ -> Enum.dedup_by(original ++ override, fn {x, _} -> x end)
         end
 
       _, _original, _override ->

@@ -177,7 +177,8 @@ defmodule QuenyaInstaller.Generator do
       quenya_dep: quenya_dep(quenya_path),
       quenya_path: quenya_path,
       in_umbrella: project.in_umbrella?,
-      namespaced?: namespaced?(project)
+      namespaced?: namespaced?(project),
+      opts: opts
     ]
 
     %Project{project | binding: binding}
