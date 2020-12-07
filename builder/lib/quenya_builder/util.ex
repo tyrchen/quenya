@@ -74,7 +74,8 @@ defmodule QuenyaBuilder.Util do
       quote do
         plug :match
 
-        plug Plug.Parsers, parsers: [:urlencoded, :multipart, :json],
+        plug Plug.Parsers,
+          parsers: [:urlencoded, :multipart, :json],
           pass: ["application/json"],
           json_decoder: Jason
 

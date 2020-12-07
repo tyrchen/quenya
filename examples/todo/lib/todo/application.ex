@@ -6,7 +6,7 @@ defmodule Todo.Application do
   use Application
 
   def start(_type, _args) do
-    port = Application.get_env(:Todo, :http, [])[:port] || 4000
+    port = Application.get_env(:todo, :http, [])[:port] || 4000
     children = [
       {Plug.Cowboy, scheme: :http, plug: Todo.Gen.Router, options: [port: port]}
     ]

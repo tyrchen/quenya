@@ -6,7 +6,7 @@ defmodule <%= @app_module %>.Application do
   use Application
 
   def start(_type, _args) do
-    port = Application.get_env(:<%= @app_module %>, :http, [])[:port] || 4000
+    port = Application.get_env(:<%= @app_name %>, :http, [])[:port] || 4000
     children = [
       {Plug.Cowboy, scheme: :http, plug: <%= @app_module %>.Gen.Router, options: [port: port]}
     ]

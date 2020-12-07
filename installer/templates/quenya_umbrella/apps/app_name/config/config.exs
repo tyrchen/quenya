@@ -10,8 +10,7 @@ import Config
 # Configures quenya API pipelines
 config :quenya,
   use_fake_handler: true,
-  use_response_validator: false,
-  apis: %{}
+  use_response_validator: true
 
 # Configures ex_json_schema to use Quenya.FormatValidator for unkown format
 config :ex_json_schema, :custom_format_validator, {Quenya.FormatValidator, :validate}
@@ -27,7 +26,7 @@ config :<%= @app_name %>,
 
 # Joken configuration
 config :joken,
-  default_signer: "<%= @opts[:jwt_secret] %>"
+  default_signer: "<%= @opts[:jwt_secret] %>",
   # four weeks
   default_exp: 4 * 7 * 24 * 60 * 60,
   iss: "<%= @app_name %>"

@@ -6,11 +6,11 @@ defmodule Petstore.Application do
   use Application
 
   def start(_type, _args) do
-    port = Application.get_env(:Petstore, :http, [])[:port] || 4000
+    port = Application.get_env(:petstore, :http, [])[:port] || 4000
+
     children = [
       {Plug.Cowboy, scheme: :http, plug: Petstore.Gen.Router, options: [port: port]}
     ]
-
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
