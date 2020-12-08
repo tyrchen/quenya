@@ -16,9 +16,13 @@ credo:
 update-dep:
 	@for dir in $(SUB_PROJECTS); do cd $${dir} && rm mix.lock && mix deps.get && cd ..; done
 
-test-all: dep credo test
+examples:
+	@cd examples/todo && mix deps.get && mix compile.quenya && mix test
+	@cd examples/petstore && mix deps.get && mix compile.quenya && mix test
+
+test-all: dep credo test examples
 
 install:
 	@cd installer; rm quenya_installer* && mix archive.install --force
 
-.PHONY: compile dep test install
+.PHONY: compile dep test install examples
