@@ -38,7 +38,7 @@ defmodule QuenyaBuilder.MixProject do
       {:json_data_faker, "~> 0.2"},
       {:plug, "~> 1.11"},
       {:quenya, "~> 0.3"},
-      {:quenya_parser, path: "../parser"},
+      {:quenya_parser, "~> 0.3"},
       {:recase, "~> 0.7"},
       {:stream_data, "~> 0.5"},
 

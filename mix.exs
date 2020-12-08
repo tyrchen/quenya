@@ -40,7 +40,7 @@ defmodule Quenya.MixProject do
       {:ex_json_schema, "~> 0.7"},
       {:joken, "~> 2.0"},
       {:json_data_faker, "~> 0.2"},
-      {:quenya_parser, path: "./parser"},
+      {:quenya_parser, "~> 0.3"},
       {:plug, "~>1.11"},
       {:stream_data, "~> 0.5"},
       {:uuid, "~> 1.0"},
