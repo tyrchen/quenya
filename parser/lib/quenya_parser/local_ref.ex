@@ -1,8 +1,8 @@
-defmodule Quenya.Parser.LocalRef do
+defmodule QuenyaParser.LocalRef do
   @moduledoc """
   Process local reference
   """
-  alias Quenya.Parser.Util
+  alias QuenyaParser.Util
 
   @doc """
   Iterate the map and replace all $ref to the actual data

@@ -1,30 +1,28 @@
+SUB_PROJECTS=builder installer parser .
+
 compile: dep
-	@cd installer; mix compile
-	@cd builder; mix compile
-	@mix compile
+	@for dir in $(SUB_PROJECTS); do cd $${dir} && mix compile && cd ..; done
 
 dep:
-	@cd installer; mix deps.get
-	@cd builder; mix deps.get
-	@mix deps.get
+	@for dir in $(SUB_PROJECTS); do cd $${dir} && mix deps.get && cd ..; done
+
 
 test: dep
-	@cd installer; mix test
-	@cd builder; mix test
-	@mix test
+	@for dir in $(SUB_PROJECTS); do cd $${dir} && mix test && cd ..; done
 
 credo:
-	@cd installer; mix credo
-	@cd builder; mix credo
-	@mix credo
+	@for dir in $(SUB_PROJECTS); do cd $${dir} && mix credo && cd ..; done
 
 update-dep:
-	@cd installer; rm mix.lock; mix deps.get
-	@cd builder; rm mix.lock; mix deps.get
-	@rm mix.lock; mix deps.get
-test-all: dep credo test
+	@for dir in $(SUB_PROJECTS); do cd $${dir} && rm mix.lock && mix deps.get && cd ..; done
+
+examples:
+	@cd examples/todo && mix deps.get && mix compile.quenya && mix test
+	@cd examples/petstore && mix deps.get && mix compile.quenya && mix test
+
+test-all: dep credo test examples
 
 install:
 	@cd installer; rm quenya_installer* && mix archive.install --force
 
-.PHONY: compile dep test install
+.PHONY: compile dep test install examples

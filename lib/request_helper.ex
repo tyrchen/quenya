@@ -55,7 +55,7 @@ defmodule Quenya.RequestHelper do
 
   def put_security_scheme(conn, nil), do: conn
 
-  def put_security_scheme(conn, {%{type: "http", scheme: "bearer", bearerFormat: "JWT"}, _opts}) do
+  def put_security_scheme(conn, {%{type: "http", scheme: "bearer", bearer_format: "JWT"}, _opts}) do
     {token, _} = Token.create_access_token(%{id: 1})
     conn |> Conn.put_req_header("authorization", "Bearer #{token}")
   end

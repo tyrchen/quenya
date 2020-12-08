@@ -100,3 +100,30 @@ jobs:
         run: cd builder && mix credo
       - name: Run tests
         run: cd builder && mix test
+
+  quenya-parser:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: [23.1]
+        elixir: [1.11]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - name: quenya parser deps cache
+        uses: actions/cache@v2
+        with:
+          path: parser/deps
+          key: ${{ runner.os }}-quenya-parser-${{ hashFiles('parser/mix.lock') }}
+          restore-keys: ${{ runner.os }}-quenya-parser-
+      - name: Install dependencies
+        run: cd parser && mix deps.get
+      - name: run credo
+        run: cd parser && mix credo
+      - name: Run tests
+        run: cd parser && mix test

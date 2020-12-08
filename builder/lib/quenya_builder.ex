@@ -3,7 +3,6 @@ defmodule QuenyaBuilder do
   Build API routes based on OpenAPI v3 spec
   """
 
-  alias Quenya.Parser
   alias QuenyaBuilder.Generator.Router
 
   @doc """
@@ -12,7 +11,7 @@ defmodule QuenyaBuilder do
   def run(filename, app) do
     path = Path.join(File.cwd!(), "gen")
 
-    case Parser.parse(filename) do
+    case QuenyaParser.parse(filename) do
       {:ok, spec} ->
         Router.gen(spec, app, path: path, create: false, output: false)
         :ok

@@ -1,46 +1,44 @@
-defmodule QuenyaBuilder.MixProject do
+defmodule Parser.MixProject do
   use Mix.Project
 
   @version "0.3.6"
   def project do
     [
-      app: :quenya_builder,
+      app: :quenya_parser,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
 
       # Docs
-      name: "QuenyaBuilder",
+      name: "Quenya Parser",
       docs: [
         extras: ["README.md"]
       ],
       source_url: "https://github.com/tyrchen/quenya",
       homepage_url: "https://github.com/tyrchen/quenya",
       description: """
-      Build API routes based on OpenAPI v3 spec.
+      Parse OpenAPI v3 spec.
       """,
       package: package()
     ]
   end
 
+  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger]
     ]
   end
 
+  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dynamic_module_new, "~> 0.1"},
+      {:deep_merge, "~> 1.0"},
       {:ex_json_schema, "~> 0.7"},
       {:jason, "~> 1.2"},
-      {:json_data_faker, "~> 0.2"},
-      {:plug, "~> 1.11"},
-      {:quenya, "~> 0.3"},
-      {:quenya_parser, path: "../parser"},
-      {:recase, "~> 0.7"},
-      {:stream_data, "~> 0.5"},
+      {:typed_struct, "~> 0.2.1"},
+      {:yaml_elixir, "~> 2.5"},
 
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
@@ -55,7 +53,7 @@ defmodule QuenyaBuilder.MixProject do
       maintainers: ["tyr.chen@gmail.com"],
       links: %{
         "GitHub" => "https://github.com/tyrchen/quenya",
-        "Docs" => "https://hexdocs.pm/quenya_builder"
+        "Docs" => "https://hexdocs.pm/quenya_parser"
       }
     ]
   end

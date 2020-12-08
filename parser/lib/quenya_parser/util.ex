@@ -1,4 +1,4 @@
-defmodule Quenya.Parser.Util do
+defmodule QuenyaParser.Util do
   @moduledoc """
   Utility functions
   """
