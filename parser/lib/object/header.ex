@@ -2,10 +2,11 @@ defmodule QuenyaParser.Object.Header do
   @moduledoc """
   Header object
   """
+
   use TypedStruct
   alias QuenyaParser.Object.{Header, Util}
 
-  typedstruct module: Header do
+  typedstruct do
     @typedoc "Header object from the spec"
     field(:description, String.t(), default: "")
     field(:required, boolean(), default: false)

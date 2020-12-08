@@ -5,7 +5,7 @@ defmodule QuenyaParser.Object.Response do
   use TypedStruct
   alias QuenyaParser.Object.{Header, MediaType, Response, Util}
 
-  typedstruct module: Response do
+  typedstruct do
     @typedoc "Response object from the spec, we won't support `links` filed at the moment"
     field(:description, String.t(), default: "")
     field(:headers, %{required(String.t()) => Header.t()}, default: %{})
