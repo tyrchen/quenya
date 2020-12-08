@@ -44,7 +44,7 @@ defmodule QuenyaBuilder.Util do
   end
 
   def get_localhost_uri(servers) do
-    Enum.reduce_while(servers, nil, fn %{"url" => url}, _acc ->
+    Enum.reduce_while(servers, nil, fn %{url: url}, _acc ->
       case URI.parse(url) do
         %URI{host: "localhost"} = uri -> {:halt, uri}
         _ -> {:cont, nil}

@@ -17,11 +17,11 @@ defmodule QuenyaParser.Object.Operation do
     field(:request_body, %{required(String.t()) => RequestBody.t()}, default: %{})
     field(:responses, %{required(String.t()) => Response.t()}, default: %{})
     field(:deprecated, Boolean.t(), default: false)
-    field(:security, %{required(String.t()) => [String.t()]}, default: %{})
+    field(:security, [%{required(String.t()) => [String.t()]}], default: [])
   end
 
-  def new(data) do
-    id = data["operationId"] || raise "operationId is REQUIRED in quenya to generate the code"
+  def new(uri, method, data) do
+    id = data["operationId"] || raise "Must define operationId for #{uri} with method #{method}. It will be used to generate code."
     %Operation {
       tags: data["tags"] || "",
       summary: data["summary"] || "",
@@ -32,7 +32,7 @@ defmodule QuenyaParser.Object.Operation do
       request_body: RequestBody.new(id, data["requestBody"]),
       responses: Response.new(id, data["responses"]),
       deprecated: data["deprecated"] || false,
-      security: data["security"]
+      security: data["security"] || []
     }
   end
 end

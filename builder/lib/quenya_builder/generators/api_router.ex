@@ -14,8 +14,6 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
 
   alias QuenyaBuilder.{Security, Util}
 
-  alias QuenyaParser.Object
-
   def gen(root, base_path, app, opts \\ []) do
     mod_name = Util.gen_api_router_name(app)
 
@@ -29,11 +27,11 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
         _ -> %{}
       end
 
-    sec_schemes = Object.gen_security_schemes(root["components"]["securitySchemes"])
-    security = Security.ensure(root["security"] || [])
+    sec_schemes = root.security_schemes
+    security = Security.ensure(root.security || [])
 
     data =
-      root["paths"]
+      root.paths
       |> Enum.map(fn {uri, ops} ->
         op_opts = [
           uri: uri,
@@ -78,7 +76,7 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
   end
 
   defp gen_uri(ops, op_opts, mod_opts) do
-    Enum.map(ops, fn {method, doc} ->
+    Enum.map(ops, fn {method, op} ->
       [
         uri: uri,
         base_path: base_path,
@@ -89,19 +87,17 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
       ] = op_opts
 
       {scheme_name, scheme_opts} =
-        Security.ensure(doc["security"] || security) |> Security.normalize()
+        Security.ensure(op.security || security) |> Security.normalize()
 
       security_data = Security.get_scheme(sec_schemes, scheme_name, scheme_opts)
 
-      name =
-        doc["operationId"] ||
-          raise "Must define operationId for #{uri} with method #{method}. It will be used to generate module name"
+      name = op.operation_id
 
       method = DynamicModule.normalize_name(method)
 
-      req = Object.gen_req_object(name, doc["requestBody"])
-      params = Object.gen_param_objects(name, doc["parameters"])
-      res = Object.gen_res_objects(name, doc["responses"])
+      req = op.request_body
+      params = op.parameters
+      res = op.responses
 
       new_mod_opts = Keyword.update!(mod_opts, :path, &Path.join(&1, name))
       RequestValidator.gen(req, params, app, name, new_mod_opts)

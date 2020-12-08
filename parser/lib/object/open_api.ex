@@ -25,20 +25,24 @@ defmodule QuenyaParser.Object.OpenApi do
 
 
   def new(data) do
-    paths = Enum.reduce(data["paths"], %{}, fn {k1, v1}, acc1 ->
-      result = Enum.reduce(v1, %{}, fn {k2, v2}, acc2 ->
-        Map.put(acc2, k2, Operation.new(v2))
+    paths = Enum.reduce(data["paths"] || %{}, %{}, fn {uri, ops}, acc1 ->
+      result = Enum.reduce(ops, %{}, fn {method, op}, acc2 ->
+        Map.put(acc2, method, Operation.new(uri, method, op))
       end)
-      Map.put(acc1, k1, result)
+      Map.put(acc1, uri, result)
     end)
+
+    if Enum.empty?(paths) do
+      raise "No route definition in schema"
+    end
 
     %OpenApi {
       openapi: data["openapi"],
       info: Info.new(data["info"]),
       servers: Enum.map(data["servers"] || [], &Server.new/1),
       paths: paths,
-      security: data["security"] || %{},
-      security_schemes: Enum.reduce(data["components"]["security_scheme"] || %{}, %{}, fn {k, v}, acc -> Map.put(acc, k, SecurityScheme.new(v)) end),
+      security: data["security"] || [],
+      security_schemes: SecurityScheme.new(data["components"]["securitySchemes"]),
       external_docs: ExternalDocument.new(data["externalDocs"])
     }
   end

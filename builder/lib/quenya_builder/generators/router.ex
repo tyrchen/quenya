@@ -6,14 +6,10 @@ defmodule QuenyaBuilder.Generator.Router do
   alias QuenyaBuilder.{Generator.ApiRouter, Util}
 
   def gen(root, app, opts \\ []) do
-    if root["paths"] == nil do
-      raise "No route definition in schema"
-    end
-
     mod_name = Util.gen_router_name(app)
 
     uri =
-      Util.get_localhost_uri(root["servers"]) ||
+      Util.get_localhost_uri(root.servers) ||
         raise "Must define localhost under servers in OAS3 spec."
 
     base_path = uri.path || "/"
