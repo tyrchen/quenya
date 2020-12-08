@@ -1,9 +1,9 @@
-defmodule Quenya.Parser.RemoteRef do
+defmodule QuenyaParser.RemoteRef do
   @moduledoc """
   Update remote ref
   """
   require Logger
-  alias Quenya.Parser.{Validator, Util}
+  alias QuenyaParser.{Validator, Util}
 
   @ref_table :ref_table
 

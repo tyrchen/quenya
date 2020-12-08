@@ -1,7 +1,7 @@
 defmodule Quenya.MixProject do
   use Mix.Project
 
-  @version "0.3.4"
+  @version "0.3.6"
   def project do
     [
       app: :quenya,
@@ -37,19 +37,17 @@ defmodule Quenya.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:deep_merge, "~> 1.0"},
       {:ex_json_schema, "~> 0.7"},
-      {:jason, "~> 1.2"},
       {:joken, "~> 2.0"},
       {:json_data_faker, "~> 0.2"},
+      {:quenya_parser, path: "./parser"},
       {:plug, "~>1.11"},
       {:stream_data, "~> 0.5"},
       {:uuid, "~> 1.0"},
-      {:yaml_elixir, "~> 2.5"},
 
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test]}
+      {:credo, "~> 1.5", only: [:dev]}
     ]
   end
 

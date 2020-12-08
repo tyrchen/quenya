@@ -14,7 +14,7 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
 
   alias QuenyaBuilder.{Security, Util}
 
-  alias QuenyaBuilder.Object
+  alias QuenyaParser.Object
 
   def gen(root, base_path, app, opts \\ []) do
     mod_name = Util.gen_api_router_name(app)

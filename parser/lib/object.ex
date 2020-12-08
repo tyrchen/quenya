@@ -1,11 +1,11 @@
-defmodule QuenyaBuilder.Object do
+defmodule QuenyaParser.Object do
   @moduledoc """
   Objects defined in OAPI specification
   """
 
   use TypedStruct
 
-  alias QuenyaBuilder.Object.{Parameter, Request, Response, Header, MediaType, SecurityScheme}
+  alias QuenyaParser.Object.{Parameter, Request, Response, Header, MediaType, SecurityScheme}
   alias ExJsonSchema.Schema
 
   # postion for params. Regular restful API shouldn't read/write cookies so we remove its support
@@ -25,57 +25,57 @@ defmodule QuenyaBuilder.Object do
 
   typedstruct module: Parameter do
     @typedoc "Parameter object from the spec"
-    field :description, String.t(), default: ""
-    field :position, String.t(), default: "query"
-    field :name, String.t(), default: ""
-    field :required, boolean(), default: false
-    field :schema, ExJsonSchema.Schema.Root
-    field :deprecated, boolean(), default: false
-    field :style, String.t(), default: "simple"
-    field :explode, boolean(), default: false
-    field :examples, list(map())
+    field(:description, String.t(), default: "")
+    field(:position, String.t(), default: "query")
+    field(:name, String.t(), default: "")
+    field(:required, boolean(), default: false)
+    field(:schema, ExJsonSchema.Schema.Root)
+    field(:deprecated, boolean(), default: false)
+    field(:style, String.t(), default: "simple")
+    field(:explode, boolean(), default: false)
+    field(:examples, list(map()))
   end
 
   typedstruct module: Request do
     @typedoc "Request object from the spec"
-    field :description, String.t(), default: ""
-    field :required, boolean(), default: false
+    field(:description, String.t(), default: "")
+    field(:required, boolean(), default: false)
     # a map of string -> MediaType
-    field :content, map(), default: %{}
+    field(:content, map(), default: %{})
   end
 
   typedstruct module: MediaType do
     @typedoc "Media Type Object from the spec, we won't support `encoding` field at the moment"
-    field :schema, ExJsonSchema.Schema.Root
-    field :examples, list(map())
+    field(:schema, ExJsonSchema.Schema.Root)
+    field(:examples, list(map()))
   end
 
   typedstruct module: Response do
     @typedoc "Response object from the spec, we won't support `links` filed at the moment"
-    field :description, String.t(), default: ""
-    field :headers, map(), default: %{}
-    field :content, map(), default: %{}
+    field(:description, String.t(), default: "")
+    field(:headers, map(), default: %{})
+    field(:content, map(), default: %{})
   end
 
   typedstruct module: Header do
     @typedoc "Header object from the spec"
-    field :description, String.t(), default: ""
-    field :required, boolean(), default: false
-    field :schema, ExJsonSchema.Schema.Root
-    field :deprecated, boolean(), default: false
-    field :style, String.t(), default: "simple"
-    field :explode, boolean(), default: false
-    field :examples, list(map())
+    field(:description, String.t(), default: "")
+    field(:required, boolean(), default: false)
+    field(:schema, ExJsonSchema.Schema.Root)
+    field(:deprecated, boolean(), default: false)
+    field(:style, String.t(), default: "simple")
+    field(:explode, boolean(), default: false)
+    field(:examples, list(map()))
   end
 
   typedstruct module: SecurityScheme do
     @typedoc "Security scheme from the spec, we only support apiKey at the moment"
-    field :type, String.t(), default: "apiKey"
-    field :description, String.t(), default: ""
-    field :name, String.t(), default: ""
-    field :position, String.t(), default: ""
-    field :scheme, String.t(), default: ""
-    field :bearerFormat, String.t(), default: ""
+    field(:type, String.t(), default: "apiKey")
+    field(:description, String.t(), default: "")
+    field(:name, String.t(), default: "")
+    field(:position, String.t(), default: "")
+    field(:scheme, String.t(), default: "")
+    field(:bearerFormat, String.t(), default: "")
   end
 
   def gen_req_object(_id, nil), do: %Request{}

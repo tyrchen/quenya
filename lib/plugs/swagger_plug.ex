@@ -91,7 +91,7 @@ defmodule Quenya.Plug.SwaggerPlug do
     case String.ends_with?(conn.request_path, "main.json") do
       true ->
         filename = Path.join(Application.app_dir(opts[:app]), "priv/spec/main.yml")
-        {:ok, spec} = Quenya.Parser.parse(filename)
+        {:ok, spec} = QuenyaParser.parse(filename)
         body = Jason.encode!(spec)
         etag = :crypto.hash(:md5, body) |> Base.encode16(case: :lower)
 

@@ -1,4 +1,4 @@
-defmodule Quenya.Parser.Validator do
+defmodule QuenyaParser.Validator do
   @moduledoc """
   Validate Open API v3 schema
   """

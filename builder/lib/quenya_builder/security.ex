@@ -2,7 +2,7 @@ defmodule QuenyaBuilder.Security do
   @moduledoc """
   Security related functions
   """
-  alias QuenyaBuilder.Object.SecurityScheme
+  alias QuenyaParser.Object.SecurityScheme
 
   def ensure(security) when length(security) > 1 do
     raise "Though OpenAPI allows to choose one of the security schemes, Quenya only allows one security being used. You could have one security define in OpenAPI object, and one in operation object if you'd want to override top level security definition. This will make the generated security processing code more performant."

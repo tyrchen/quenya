@@ -1,7 +1,7 @@
 defmodule QuenyaInstaller.MixProject do
   use Mix.Project
 
-  @version "0.3.5"
+  @version "0.3.6"
   def project do
     [
       app: :quenya_installer,
@@ -27,7 +27,7 @@ defmodule QuenyaInstaller.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :eex]
+      extra_applications: [:logger, :eex, :crypto]
     ]
   end
 
@@ -36,7 +36,7 @@ defmodule QuenyaInstaller.MixProject do
     [
       # dev/test deps
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test]}
+      {:credo, "~> 1.5", only: [:dev]}
     ]
   end
 

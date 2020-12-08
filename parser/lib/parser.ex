@@ -1,8 +1,8 @@
-defmodule Quenya.Parser do
+defmodule QuenyaParser do
   @moduledoc """
   OpenAPI schema parser
   """
-  alias Quenya.Parser.{Validator, RemoteRef, LocalRef}
+  alias QuenyaParser.{Validator, RemoteRef, LocalRef}
 
   @spec parse(binary) :: {:error, String.t()} | {:ok, map()}
   def parse(filename) do
