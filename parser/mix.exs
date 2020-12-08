@@ -46,7 +46,6 @@ defmodule Parser.MixProject do
     ]
   end
 
-
   defp package do
     [
       files: ["lib", "mix.exs", "README*", "../LICENSE*"],

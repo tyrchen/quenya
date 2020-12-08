@@ -27,7 +27,7 @@ defmodule QuenyaBuilder.Security do
   def get_plug(nil), do: nil
   def get_plug({%SecurityScheme{type: "apiKey"}, _opts}), do: Quenya.Plug.ApiKeyPlug
 
-  def get_plug({%SecurityScheme{type: "http", scheme: "bearer", bearerFormat: "JWT"}, _opts}),
+  def get_plug({%SecurityScheme{type: "http", scheme: "bearer", bearer_format: "JWT"}, _opts}),
     do: Quenya.Plug.JwtPlug
 
   def get_plug(scheme), do: raise("Unsupported security scheme: #{inspect(scheme)}")
