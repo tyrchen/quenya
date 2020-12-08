@@ -1,6 +1,6 @@
 # Quenya
 
-__Disclaimer: Quenya is under active development and is at its early stage. Use with cautions.__
+__Disclaimer: Quenya is under active development and is at its early stage. Please DO NOT use it in prod environment. Use with cautions.__
 
 Quenya is a framework to build high-quality REST API applications based on extended [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md). For the Quenya extension, see [here](docs/quenya_extension.md). With the OAPI spec, Quenya can generate high-quality code for many parts of the API pipeline:
 
@@ -48,7 +48,7 @@ Once you finished installing quenya CLI, you can build a API app with quenya:
 
 ```bash
 $ cd /tmp
-$ curl https://raw.githubusercontent.com/tyrchen/quenya/master/test/fixture/petstore.yml > petstore.yml
+$ curl https://raw.githubusercontent.com/tyrchen/quenya/master/parser/test/fixture/petstore.yml > petstore.yml
 $ mix quenya.new petstore.yml petstore
 * creating petstore/config/config.exs
 * creating petstore/config/dev.exs
