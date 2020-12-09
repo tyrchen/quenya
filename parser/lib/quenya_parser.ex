@@ -5,11 +5,23 @@ defmodule QuenyaParser do
   alias QuenyaParser.{Validator, RemoteRef, LocalRef}
   alias QuenyaParser.Object.OpenApi
 
-  @spec parse(binary) :: {:error, String.t()} | {:ok, map()}
+  @spec parse(binary) :: {:error, String.t()} | {:ok, OpenApi.t()}
   def parse(filename) do
-    case Validator.validate(filename) do
-      {:ok, content} -> do_parse(Path.dirname(filename), content)
-      {:error, _} -> {:error, "failed to read or validate file #{filename}"}
+    with {:ok, content} <- Validator.validate(filename),
+        {:ok, parsed} <- do_parse(Path.dirname(filename), content) do
+          {:ok, OpenApi.new(parsed)}
+        else
+          e -> e
+    end
+  end
+
+  @spec parse(binary) :: {:error, String.t()} | {:ok, map()}
+  def parse_as_map(filename) do
+    with {:ok, content} <- Validator.validate(filename),
+        {:ok, parsed} <- do_parse(Path.dirname(filename), content) do
+          {:ok, parsed}
+        else
+          e -> e
     end
   end
 
@@ -31,7 +43,7 @@ defmodule QuenyaParser do
   defp do_extend_refs(dir, data) do
     with {:ok, r1} <- RemoteRef.update(data, dir),
          {:ok, r2} <- LocalRef.update(r1) do
-      {:ok, OpenApi.new(r2)}
+      {:ok, r2}
     else
       e -> e
     end
