@@ -22,7 +22,8 @@ defmodule QuenyaInstaller.Single do
     {:eex, "quenya_single/gitignore", :project, ".gitignore"},
 
     # test files
-    {:eex, "quenya_single/test/test_helper.exs", :project, "test/test_helper.exs"}
+    {:eex, "quenya_single/test/test_helper.exs", :project, "test/test_helper.exs"},
+    {:eex, "quenya_single/test/support/hooks.exs", :project, "test/support/hooks.exs"}
   ])
 
   template(:bare, [])

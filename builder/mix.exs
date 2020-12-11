@@ -1,7 +1,7 @@
 defmodule QuenyaBuilder.MixProject do
   use Mix.Project
 
-  @version "0.3.7"
+  @version "0.3.8"
   def project do
     [
       app: :quenya_builder,

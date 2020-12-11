@@ -35,6 +35,10 @@ defmodule QuenyaBuilder.Util do
     gen_module_name(:"#{app}_test", "Gen", name)
   end
 
+  def gen_test_hook_name(app, name) do
+    gen_module_name(:"#{app}_test", "Hooks", name)
+  end
+
   def gen_router_name(app) do
     gen_module_name(app, "Gen", "Router")
   end

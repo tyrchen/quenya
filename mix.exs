@@ -1,13 +1,14 @@
 defmodule Quenya.MixProject do
   use Mix.Project
 
-  @version "0.3.7"
+  @version "0.3.8"
   def project do
     [
       app: :quenya,
       version: @version,
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
       deps: deps(),
 
@@ -33,6 +34,9 @@ defmodule Quenya.MixProject do
       extra_applications: [:logger, :crypto]
     ]
   end
+
+  defp elixirc_paths(env) when env in [:test, :dev], do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
