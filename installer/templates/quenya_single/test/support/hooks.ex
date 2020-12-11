@@ -23,7 +23,6 @@ defmodule <%= @app_module %>Test.Hooks do
         end
       end
   """
-  alias QuenyaTest.Hook
 
 
 end

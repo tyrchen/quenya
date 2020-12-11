@@ -5,7 +5,7 @@ defmodule Todo.MixProject do
     [
       app: :todo,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -27,7 +27,7 @@ defmodule Todo.MixProject do
   defp elixirc_paths(env) when env in [:dev, :test], do: ["lib", "gen", "test/support"]
   defp elixirc_paths(_), do: ["lib", "gen"]
 
-  # Specifies your project dependencies.mix
+  # Specifies your project dependencies.
   #
   # Type `mix help deps` for examples and options.
   defp deps do

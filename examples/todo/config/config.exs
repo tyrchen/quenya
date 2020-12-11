@@ -26,10 +26,10 @@ config :todo,
 
 # Joken configuration
 config :joken,
-  default_signer: {:system, "JWT_SECRET"},
-  # two weeks
-  default_exp: 2 * 7 * 24 * 60 * 60,
-  iss: "Todo Service"
+  default_signer: "/Q5kLc9r+Zl4BMsaTVPK+vPRFKGfDhU2TBR2BJCNCm6skhVssz/JUoVEkBhRnPqV",
+  # four weeks
+  default_exp: 4 * 7 * 24 * 60 * 60,
+  iss: "todo"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
