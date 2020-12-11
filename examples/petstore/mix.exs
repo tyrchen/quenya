@@ -24,7 +24,7 @@ defmodule Petstore.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "gen", "test/support"]
+  defp elixirc_paths(env) when env in [:dev, :test], do: ["lib", "gen", "test/support"]
   defp elixirc_paths(_), do: ["lib", "gen"]
 
   # Specifies your project dependencies.
@@ -42,7 +42,10 @@ defmodule Petstore.MixProject do
       {:quenya_builder, path: "../../builder", override: true, runtime: false},
 
       # Only needed if you'd like to generate fake handler
-      {:json_data_faker, "~> 0.1"}
+      {:json_data_faker, "~> 0.1"},
+
+      # dev and test
+      {:mock, "~> 0.3.0", only: :test}
     ]
   end
 end

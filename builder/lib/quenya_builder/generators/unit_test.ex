@@ -9,10 +9,11 @@ defmodule QuenyaBuilder.Generator.UnitTest do
   def gen(method, path, data, app, name, opts \\ []) do
     [req: req, params: params, res: res, security_data: security_data] = data
     mod_name = Util.gen_test_name(app, name)
+    mod_hook = Module.concat("Elixir", Util.gen_test_hook_name(app, name))
 
     router_mod = Module.concat("Elixir", Util.gen_router_name(app))
     preamble = gen_preamble(router_mod)
-    contents = gen_tests(method, path, router_mod, req.content, params, res, security_data)
+    contents = gen_tests(mod_hook, method, path, router_mod, req.content, params, res, security_data)
 
     DynamicModule.gen(mod_name, preamble, contents, opts)
   end
@@ -23,15 +24,19 @@ defmodule QuenyaBuilder.Generator.UnitTest do
       use Plug.Test
       use ExUnitProperties
 
+      import Mock
+
       alias Quenya.{RequestHelper, ResponseHelper, TestHelper}
       alias ExJsonSchema.Validator
+      alias QuenyaTest.HookHelper
 
       @opts apply(unquote(router), :init, [[]])
     end
   end
 
-  defp gen_tests(method, path, router_mod, content, params, res, security_data) do
+  defp gen_tests(mod_hook, method, path, router_mod, content, params, res, security_data) do
     quote do
+      HookHelper.ensure_loaded(unquote(mod_hook))
       property unquote(path) <> ": should work" do
         check all(
                 uri <- TestHelper.stream_gen_uri(path(), params()),
@@ -58,7 +63,15 @@ defmodule QuenyaBuilder.Generator.UnitTest do
             end)
 
           conn = conn |> RequestHelper.put_security_scheme(security_data())
-          conn = apply(router_mod(), :call, [conn, @opts])
+
+          HookHelper.run_precondition(mod_hook())
+          mocks = HookHelper.get_mocks(mod_hook())
+
+          conn = with_mocks mocks do
+            apply(router_mod(), :call, [conn, @opts])
+          end
+
+          HookHelper.run_cleanup(mod_hook())
 
           assert conn.status == code
 
@@ -78,6 +91,7 @@ defmodule QuenyaBuilder.Generator.UnitTest do
         end
       end
 
+      def mod_hook, do: unquote(mod_hook)
       def method, do: unquote(method)
       def path, do: unquote(path)
       def content, do: unquote(content)
@@ -85,6 +99,7 @@ defmodule QuenyaBuilder.Generator.UnitTest do
       def res, do: unquote(res)
       def router_mod, do: unquote(router_mod)
       def security_data, do: unquote(security_data)
+
     end
   end
 end
