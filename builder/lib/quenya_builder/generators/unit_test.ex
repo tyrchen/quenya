@@ -28,6 +28,7 @@ defmodule QuenyaBuilder.Generator.UnitTest do
 
       alias Quenya.{RequestHelper, ResponseHelper, TestHelper}
       alias ExJsonSchema.Validator
+      alias QuenyaTest.HookHelper
 
       @opts apply(unquote(router), :init, [[]])
     end
@@ -35,7 +36,7 @@ defmodule QuenyaBuilder.Generator.UnitTest do
 
   defp gen_tests(mod_hook, method, path, router_mod, content, params, res, security_data) do
     quote do
-      Code.ensure_loaded(unquote(mod_hook))
+      HookHelper.ensure_loaded(unquote(mod_hook))
       property unquote(path) <> ": should work" do
         check all(
                 uri <- TestHelper.stream_gen_uri(path(), params()),
@@ -63,14 +64,14 @@ defmodule QuenyaBuilder.Generator.UnitTest do
 
           conn = conn |> RequestHelper.put_security_scheme(security_data())
 
-          run_precondition()
-          mocks = get_mocks()
+          HookHelper.run_precondition(mod_hook())
+          mocks = HookHelper.get_mocks(mod_hook())
 
           conn = with_mocks mocks do
             apply(router_mod(), :call, [conn, @opts])
           end
 
-          run_cleanup()
+          HookHelper.run_cleanup(mod_hook())
 
           assert conn.status == code
 
@@ -90,6 +91,7 @@ defmodule QuenyaBuilder.Generator.UnitTest do
         end
       end
 
+      def mod_hook, do: unquote(mod_hook)
       def method, do: unquote(method)
       def path, do: unquote(path)
       def content, do: unquote(content)
@@ -98,29 +100,6 @@ defmodule QuenyaBuilder.Generator.UnitTest do
       def router_mod, do: unquote(router_mod)
       def security_data, do: unquote(security_data)
 
-      defp run_precondition do
-        if hook_exists?(:precondition) do
-          apply(unquote(mod_hook), :precondition, [])
-        end
-
-      end
-
-      defp get_mocks do
-        case hook_exists?(:mocks) do
-          true -> apply(unquote(mod_hook), :mocks, [])
-          _ -> []
-        end
-      end
-
-      defp run_cleanup do
-        if hook_exists?(:cleanup) do
-          apply(unquote(mod_hook), :cleanup, [])
-        end
-      end
-
-      defp hook_exists?(fname) do
-        function_exported?(unquote(mod_hook), fname, 0)
-      end
     end
   end
 end
