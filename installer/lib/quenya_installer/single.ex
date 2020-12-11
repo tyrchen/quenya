@@ -23,7 +23,7 @@ defmodule QuenyaInstaller.Single do
 
     # test files
     {:eex, "quenya_single/test/test_helper.exs", :project, "test/test_helper.exs"},
-    {:eex, "quenya_single/test/support/hooks.exs", :project, "test/support/hooks.exs"}
+    {:eex, "quenya_single/test/support/hooks.ex", :project, "test/support/hooks.ex"}
   ])
 
   template(:bare, [])
