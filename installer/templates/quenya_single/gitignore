@@ -30,3 +30,4 @@ erl_crash.dump
 /gen
 /lib/gen
 /test/gen
+priv/spec/main.yml.json

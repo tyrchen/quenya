@@ -30,3 +30,4 @@ todo-*.tar
 /gen
 /lib/gen
 /test/gen
+priv/spec/main.yml.json
