@@ -19,7 +19,7 @@ defmodule QuenyaBuilder.Generator.ApiRouter do
 
     preamble = gen_preamble()
 
-    config_file = "priv/api_config.yml"
+    config_file = "priv/api_config_#{Mix.env()}.yml"
 
     config =
       case File.exists?(config_file) do
