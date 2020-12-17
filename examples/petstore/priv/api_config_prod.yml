@@ -1,0 +1,136 @@
+---
+addPet:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.AddPet.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.AddPet.FakeHandler: {}
+  postprocessors:
+updatePet:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.UpdatePet.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UpdatePet.FakeHandler: {}
+  postprocessors:
+findPetsByStatus:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.FindPetsByStatus.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.FindPetsByStatus.FakeHandler: {}
+  postprocessors:
+findPetsByTags:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.FindPetsByTags.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.FindPetsByTags.FakeHandler: {}
+  postprocessors:
+deletePet:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.DeletePet.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.DeletePet.FakeHandler: {}
+  postprocessors:
+getPetById:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.GetPetById.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetPetById.FakeHandler: {}
+  postprocessors:
+updatePetWithForm:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.UpdatePetWithForm.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UpdatePetWithForm.FakeHandler: {}
+  postprocessors:
+uploadFile:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.UploadFile.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UploadFile.FakeHandler: {}
+  postprocessors:
+getInventory:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.GetInventory.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetInventory.FakeHandler: {}
+  postprocessors:
+placeOrder:
+  preprocessors:
+    - Petstore.Gen.PlaceOrder.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.PlaceOrder.FakeHandler: {}
+  postprocessors:
+deleteOrder:
+  preprocessors:
+    - Petstore.Gen.DeleteOrder.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.DeleteOrder.FakeHandler: {}
+  postprocessors:
+getOrderById:
+  preprocessors:
+    - Petstore.Gen.GetOrderById.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetOrderById.FakeHandler: {}
+  postprocessors:
+createUser:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.CreateUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.CreateUser.FakeHandler: {}
+  postprocessors:
+createUsersWithArrayInput:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.CreateUsersWithArrayInput.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.CreateUsersWithArrayInput.FakeHandler: {}
+  postprocessors:
+createUsersWithListInput:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.CreateUsersWithListInput.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.CreateUsersWithListInput.FakeHandler: {}
+  postprocessors:
+loginUser:
+  preprocessors:
+    - Petstore.Gen.LoginUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.LoginUser.FakeHandler: {}
+  postprocessors:
+logoutUser:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.LogoutUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.LogoutUser.FakeHandler: {}
+  postprocessors:
+deleteUser:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.DeleteUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.DeleteUser.FakeHandler: {}
+  postprocessors:
+getUserByName:
+  preprocessors:
+    - Petstore.Gen.GetUserByName.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.GetUserByName.FakeHandler: {}
+  postprocessors:
+updateUser:
+  preprocessors:
+    - Quenya.Plug.JwtPlug: {}
+    - Petstore.Gen.UpdateUser.RequestValidator: {}
+  handlers:
+    - Petstore.Gen.UpdateUser.FakeHandler: {}
+  postprocessors:

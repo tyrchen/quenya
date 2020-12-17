@@ -106,6 +106,8 @@ defmodule QuenyaBuilder.Generator.RequestValidator do
         {:error, [{msg, _} | _]} -> raise(Plug.BadRequestError, msg)
         :ok -> :ok
       end
+
+      context = Map.put(context, "_body", data)
     end
   end
 end
